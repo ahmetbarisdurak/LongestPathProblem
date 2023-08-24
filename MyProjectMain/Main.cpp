@@ -11,7 +11,7 @@ using namespace std;
 
 #define DISTANCE 200
 #define TOLERANCE 50
-#define CITY_COUNT 4
+#define CITY_COUNT 81
 
 class StaticVectorTest : public ::testing::Test {
 protected:
@@ -329,7 +329,7 @@ TEST_F(LinkedListTest, ClearTest) {
 	EXPECT_EQ(linkedList.GetSize(), 0);
 }
 
-void readCSVFile(StaticVector<StaticVector<int, 81>, 81>& cityDistances, StaticVector<std::string, 81>& cityNames) {
+void readCSVFile(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& cityDistances, StaticVector<std::string, CITY_COUNT>& cityNames) {
 	std::ifstream file("ilmesafe.csv"); // Open the CSV file
 
 	if (file.is_open()) {
@@ -387,8 +387,10 @@ int dfs(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, Stat
 			if (longestPath < newPathLength) { // finding the max componenet size and it's visiting order
 				longestPath = newPathLength;
 			}
-			else
-				visitOrder.PopBack();
+			else {
+				for (int j = 0; j < newPathLength - pathLength + 1; j++)
+					visitOrder.PopBack();
+			}
 		}
 	}
 
@@ -411,10 +413,12 @@ int findMaxConnectedVertices(StaticVector<StaticVector<int, CITY_COUNT>, CITY_CO
 	cout << visitOrder.GetSize() << " is the size of visit order" << endl;
 	
 	for (int i = 0; i < visitOrder.GetSize(); i++) {
-		//if (visitOrder.GetIndex(i) == -1)
-			//break;
+		if (visitOrder.GetIndex(i) == -1)
+			break;
 		cout << visitOrder.GetIndex(i) << "->";
 	}
+
+	cout << endl;
 
 	return maxConnected;
 }
@@ -426,25 +430,41 @@ int main() {
 	adjMatrix.GetIndex(0).SetIndex(1, 230);
 	adjMatrix.GetIndex(0).SetIndex(2, 180);
 	adjMatrix.GetIndex(0).SetIndex(3, 711);
+	adjMatrix.GetIndex(0).SetIndex(4, 234);
 
 	adjMatrix.GetIndex(1).SetIndex(0, 230);
 	adjMatrix.GetIndex(1).SetIndex(1, 0);
 	adjMatrix.GetIndex(1).SetIndex(2, 400);
 	adjMatrix.GetIndex(1).SetIndex(3, 300);
+	adjMatrix.GetIndex(1).SetIndex(4, 193);
 
 	adjMatrix.GetIndex(2).SetIndex(0, 180);
 	adjMatrix.GetIndex(2).SetIndex(1, 400);
 	adjMatrix.GetIndex(2).SetIndex(2, 0);
 	adjMatrix.GetIndex(2).SetIndex(3, 230);
+	adjMatrix.GetIndex(2).SetIndex(4, 312);
 
 	adjMatrix.GetIndex(3).SetIndex(0, 711);
 	adjMatrix.GetIndex(3).SetIndex(1, 300);
 	adjMatrix.GetIndex(3).SetIndex(2, 230);
 	adjMatrix.GetIndex(3).SetIndex(3, 0);
+	adjMatrix.GetIndex(3).SetIndex(4, 215);
+	
 
+	adjMatrix.GetIndex(4).SetIndex(0, 234);
+	adjMatrix.GetIndex(4).SetIndex(1, 193);
+	adjMatrix.GetIndex(4).SetIndex(2, 312);
+	adjMatrix.GetIndex(4).SetIndex(3, 215);
+	adjMatrix.GetIndex(4).SetIndex(4, 0);
 
 	
-	 findMaxConnectedVertices(adjMatrix);  // Output should be 3
+	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> cityDistances;
+	StaticVector<std::string, CITY_COUNT> cityNames;
+
+	readCSVFile(cityDistances, cityNames);
+	
+
+	 findMaxConnectedVertices(cityDistances);  // Output should be 3
 
 	return 0;
 }
