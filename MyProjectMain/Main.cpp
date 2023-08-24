@@ -386,6 +386,7 @@ int dfs(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, Stat
 
 			if (longestPath < newPathLength) { // finding the max componenet size and it's visiting order
 				longestPath = newPathLength;
+
 			}
 			else {
 				for (int j = 0; j < newPathLength - pathLength + 1; j++)
