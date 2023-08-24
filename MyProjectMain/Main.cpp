@@ -4,8 +4,14 @@
 #include <LinkedListLibrary.h>
 #include <StaticVectorLibrary.h>
 #include <gtest/gtest.h>
+#include <fstream>
+#include <string>
 
 using namespace std;
+
+#define DISTANCE 200
+#define TOLERANCE 50
+#define CITY_COUNT 4
 
 class StaticVectorTest : public ::testing::Test {
 protected:
@@ -323,8 +329,155 @@ TEST_F(LinkedListTest, ClearTest) {
 	EXPECT_EQ(linkedList.GetSize(), 0);
 }
 
+void readCSVFile(StaticVector<StaticVector<int, 81>, 81>& cityDistances, StaticVector<std::string, 81>& cityNames) {
+	std::ifstream file("ilmesafe.csv"); // Open the CSV file
+
+	if (file.is_open()) {
+		std::string line;
+		int i = 0;
+		int j = 0;
+
+		std::getline(file, line);
+		std::getline(file, line);
+		while (std::getline(file, line)) {
+			std::istringstream iss(line);
+			std::string token;
+			std::getline(iss, token, ';'); // city plate
+
+			std::getline(iss, token, ';'); // city name
+			cityNames.SetIndex(i, token);
+
+
+			while (std::getline(iss, token, ';')) {
+				int value;
+				std::istringstream(token) >> value;
+				cityDistances.GetIndex(i).SetIndex(j, value);
+				j++;
+			}
+
+			i++;
+			j = 0;
+
+			if (i == 81)
+				break;
+		}
+
+		file.close(); // Close the CSV file
+	
+	}
+	else {
+		std::cout << "File is not open" << std::endl;
+	}
+
+
+
+}
+
+int dfs(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, StaticVector<bool, CITY_COUNT>& visited, int vertex, int pathLength, StaticVector<int, CITY_COUNT>& visitOrder) {
+	visited.SetIndex(vertex, true); // Set index as visited
+	visitOrder.SetIndex(pathLength - 1 , vertex); // add the index to visited order 
+
+	int longestPath = pathLength;
+
+	for (int neighbor = 0; neighbor < CITY_COUNT; ++neighbor) {
+		if (adjMatrix.GetIndex(vertex).GetIndex(neighbor) >= (DISTANCE - TOLERANCE) && adjMatrix.GetIndex(vertex).GetIndex(neighbor) <= (DISTANCE + TOLERANCE) && !visited.GetIndex(neighbor)) {
+			
+			int newPathLength = dfs(adjMatrix, visited, neighbor, pathLength + 1, visitOrder);
+
+			if (longestPath < newPathLength) { // finding the max componenet size and it's visiting order
+				longestPath = newPathLength;
+			}
+			else
+				visitOrder.PopBack();
+		}
+	}
+
+	return longestPath;
+}
+
+int findMaxConnectedVertices(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix) {
+	
+	StaticVector<bool, CITY_COUNT> visited(false);
+	StaticVector<int, CITY_COUNT> visitOrder(-1);
+	StaticVector<int, CITY_COUNT> maxVisitOrder(-1);
+
+	int maxConnected = 0;
+	int startVertex = 0;
+	int componentSize = 0;
+
+	maxConnected = dfs(adjMatrix, visited, startVertex, 1, visitOrder);
+
+	cout << "Max connected is " << maxConnected << endl;
+	cout << visitOrder.GetSize() << " is the size of visit order" << endl;
+	
+	for (int i = 0; i < visitOrder.GetSize(); i++) {
+		//if (visitOrder.GetIndex(i) == -1)
+			//break;
+		cout << visitOrder.GetIndex(i) << "->";
+	}
+
+	return maxConnected;
+}
+
+int main() {
+	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> adjMatrix;
+	
+	adjMatrix.GetIndex(0).SetIndex(0, 0);
+	adjMatrix.GetIndex(0).SetIndex(1, 230);
+	adjMatrix.GetIndex(0).SetIndex(2, 180);
+	adjMatrix.GetIndex(0).SetIndex(3, 711);
+
+	adjMatrix.GetIndex(1).SetIndex(0, 230);
+	adjMatrix.GetIndex(1).SetIndex(1, 0);
+	adjMatrix.GetIndex(1).SetIndex(2, 400);
+	adjMatrix.GetIndex(1).SetIndex(3, 300);
+
+	adjMatrix.GetIndex(2).SetIndex(0, 180);
+	adjMatrix.GetIndex(2).SetIndex(1, 400);
+	adjMatrix.GetIndex(2).SetIndex(2, 0);
+	adjMatrix.GetIndex(2).SetIndex(3, 230);
+
+	adjMatrix.GetIndex(3).SetIndex(0, 711);
+	adjMatrix.GetIndex(3).SetIndex(1, 300);
+	adjMatrix.GetIndex(3).SetIndex(2, 230);
+	adjMatrix.GetIndex(3).SetIndex(3, 0);
+
+
+	
+	 findMaxConnectedVertices(adjMatrix);  // Output should be 3
+
+	return 0;
+}
+
+
+
+
+
+
+/*
 int main(int argc, char** argv)
 {
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
+	StaticVector<StaticVector<int, 81>, 81> cityDistances;
+	StaticVector<std::string, 81> cityNames;
+
+	readCSVFile(cityDistances, cityNames);
+
+	for (int i = 0; i < 81; i++) {
+		for (int j = 0; j < 81; j++) {
+			std::cout << cityDistances.GetIndex(i).GetIndex(j) << " ";
+		}
+		std::cout << std::endl;
+	}
+
+	for (int i = 0; i < 81; i++) {
+		std::cout << cityNames.GetIndex(i) << endl;
+	}
+
+	return 0;
+
+	
+	//::testing::InitGoogleTest(&argc, argv);
+	//return RUN_ALL_TESTS();
+	
 }
+*/

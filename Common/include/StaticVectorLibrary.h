@@ -11,6 +11,8 @@ class StaticVector {
 public:
 	StaticVector();
 
+	StaticVector(T element);
+
 	~StaticVector() = default;
 
 	// Printing the elements of the vector
@@ -31,7 +33,10 @@ public:
 	// returns the size of the vector
 	int GetSize();
 
+	T& GetIndex(int index);
 	
+	void SetIndex(int index, T element);
+
 	class StaticVectorIterator : public Iterator<T> {
 	private:
 		int currentIndex = 0;
@@ -101,6 +106,16 @@ private:
 template <class T, unsigned int N>
 StaticVector<T, N>::StaticVector() : size(0) {}
 
+
+template <class T, unsigned int N>
+StaticVector<T, N>::StaticVector(T element) {
+	size = N;
+	for (int i = 0; i < N; i++) {
+		staticVectorData[i] = element;
+	}
+}
+
+
 template <class T, unsigned int N>
 bool StaticVector<T, N>::PushBack(T element) {
 	if (size >= capacity) {
@@ -113,6 +128,18 @@ bool StaticVector<T, N>::PushBack(T element) {
 	}
 }
 
+
+template <class T, unsigned int N>
+T& StaticVector<T, N>::GetIndex(int index) {
+	return staticVectorData[index];
+}
+
+
+template <class T, unsigned int N>
+void StaticVector<T, N>::SetIndex(int index, T element) {
+	staticVectorData[index] = element;
+
+}
 template <class T, unsigned int N>
 bool StaticVector<T, N>::PopBack() {
 	if (size == 0)
