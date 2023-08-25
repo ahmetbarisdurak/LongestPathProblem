@@ -153,7 +153,7 @@ bool LinkedList<T, N>::PushBack(const T& element) {
 		first = allocatedNode;
 
 		last = first;
-		cout << "Element pushed to first place!" << endl;
+		//cout << "Element pushed to first place!" << endl;
 
 	}
 	else {
@@ -167,7 +167,7 @@ bool LinkedList<T, N>::PushBack(const T& element) {
 		allocatedNode->next = NULL;
 
 		last->next = allocatedNode;
-		cout << "Element pushed to back of the list " << endl;
+		//cout << "Element pushed to back of the list " << endl;
 		last = last->next;
 	}
 
@@ -179,7 +179,7 @@ template <class T, unsigned int N>
 bool LinkedList<T, N>::PopBack() {
 
 	if (first == NULL) {
-		cout << "Linked list is empty!" << endl;
+		//cout << "Linked list is empty!" << endl;
 		return false;
 	}
 
@@ -197,7 +197,7 @@ bool LinkedList<T, N>::PopBack() {
 			nodePool.Free(new Node<T>()); // Outside object for testing
 			temp->next = NULL;
 			last = temp;
-			cout << "last item is popped" << endl;
+			//cout << "last item is popped" << endl;
 			break;
 		}
 		temp = temp->next;
@@ -211,12 +211,13 @@ template <class T, unsigned int N>
 void LinkedList<T, N>::PrintValues() {
 
 	if (first == NULL)
-		cout << "Linked list is empty" << endl;
+		return;
+		//cout << "Linked list is empty" << endl;
 
 	Node<T>* temp = first;
-	cout << "List is: " << endl;
+	//cout << "List is: " << endl;
 	while (temp != NULL) {
-		cout << temp->data << endl;
+		cout << temp->data << "->";
 		temp = temp->next;
 	}
 }
@@ -287,7 +288,7 @@ template <class T, unsigned int N>
 bool LinkedList<T, N>::Erase(LinkedListIterator& pos) {
 
 	if (pos.currentNode == NULL) {
-		cout << "Can't delete the null node" << endl;
+		//cout << "Can't delete the null node" << endl;
 		return false;
 	}
 	else if (first == pos.currentNode) { // If iterator is at the first element
@@ -301,21 +302,20 @@ bool LinkedList<T, N>::Erase(LinkedListIterator& pos) {
 
 		pos.Prev();
 		last = pos.currentNode;
-		cout << "Current last data is " << last->data << endl;
-		if (nodePool.Free(last->next))
-			cout << "Free is successful1" << endl;
+		nodePool.Free(last->next);
+			//cout << "Free is successful1" << endl;
 	}
 	else {
 		Node<T>* nextNode = pos.currentNode->next;
 		pos.Prev();
 		
-		if (nodePool.Free(pos.currentNode->next))
-			cout << "Free is successful2" << endl;
+		nodePool.Free(pos.currentNode->next);
+			//cout << "Free is successful2" << endl;
 
 		pos.currentNode->next = nextNode;
 
 	}
-	cout << "Erase is succesful3" << endl;
+	//cout << "Erase is succesful3" << endl;
 	size--;
 	return true;
 }

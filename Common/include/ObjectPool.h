@@ -66,7 +66,7 @@ typename T* ObjectPool<T, N>::Allocate() {
 		}
 	}
 	
-	cout << "There is no capacity for object" << endl;
+	//cout << "There is no capacity for object" << endl;
 	return NULL;
 }
 
@@ -78,11 +78,11 @@ bool ObjectPool<T, N>::Free(T* freedObject) {
 			poolAvailability[i] = AVAILABLE;
 			usedObjects--;
 
-			cout << "Free is completed returning the value " << endl;
+			//cout << "Free is completed returning the value " << endl;
 			return true;
 		}
 	}
 	
-	cout << "This object is not in the pool" << endl;
+	//cout << "This object is not in the pool" << endl;
 	return false;
 }

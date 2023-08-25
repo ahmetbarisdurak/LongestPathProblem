@@ -373,24 +373,31 @@ void readCSVFile(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& cityDi
 
 }
 
-int dfs(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, StaticVector<bool, CITY_COUNT>& visited, int vertex, int pathLength, StaticVector<int, CITY_COUNT>& visitOrder) {
+int dfs(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, StaticVector<bool, CITY_COUNT>& visited, int vertex, int pathLength, LinkedList<int, CITY_COUNT>& visitOrder) {
 	visited.SetIndex(vertex, true); // Set index as visited
-	visitOrder.SetIndex(pathLength - 1 , vertex); // add the index to visited order 
+	visitOrder.PushBack(vertex);
 
 	int longestPath = pathLength;
 
 	for (int neighbor = 0; neighbor < CITY_COUNT; ++neighbor) {
 		if (adjMatrix.GetIndex(vertex).GetIndex(neighbor) >= (DISTANCE - TOLERANCE) && adjMatrix.GetIndex(vertex).GetIndex(neighbor) <= (DISTANCE + TOLERANCE) && !visited.GetIndex(neighbor)) {
 			
-			int newPathLength = dfs(adjMatrix, visited, neighbor, pathLength + 1, visitOrder);
+			LinkedList<int, CITY_COUNT> subOrder;
+
+			int newPathLength = dfs(adjMatrix, visited, neighbor, pathLength + 1, subOrder);
 
 			if (longestPath < newPathLength) { // finding the max componenet size and it's visiting order
-				longestPath = newPathLength;
 
-			}
-			else {
-				for (int j = 0; j < newPathLength - pathLength + 1; j++)
-					visitOrder.PopBack();
+				LinkedList<int, CITY_COUNT>::LinkedListIterator llIterator = subOrder.GetIterator();
+
+				visitOrder.Clear();
+				visitOrder.PushBack(vertex);
+
+				while (llIterator.HasNext()) {
+					visitOrder.PushBack(llIterator.Next());
+				}
+
+				longestPath = newPathLength;
 			}
 		}
 	}
@@ -401,25 +408,17 @@ int dfs(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, Stat
 int findMaxConnectedVertices(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix) {
 	
 	StaticVector<bool, CITY_COUNT> visited(false);
-	StaticVector<int, CITY_COUNT> visitOrder(-1);
-	StaticVector<int, CITY_COUNT> maxVisitOrder(-1);
+	LinkedList<int, CITY_COUNT> visitOrder;
+
 
 	int maxConnected = 0;
-	int startVertex = 0;
-	int componentSize = 0;
+	int startVertex = 5; // city plate number
 
 	maxConnected = dfs(adjMatrix, visited, startVertex, 1, visitOrder);
 
-	cout << "Max connected is " << maxConnected << endl;
-	cout << visitOrder.GetSize() << " is the size of visit order" << endl;
+	std::cout << "Max connected is " << maxConnected << endl;
 	
-	for (int i = 0; i < visitOrder.GetSize(); i++) {
-		if (visitOrder.GetIndex(i) == -1)
-			break;
-		cout << visitOrder.GetIndex(i) << "->";
-	}
-
-	cout << endl;
+	visitOrder.PrintValues();
 
 	return maxConnected;
 }
@@ -437,7 +436,7 @@ int main() {
 	adjMatrix.GetIndex(1).SetIndex(1, 0);
 	adjMatrix.GetIndex(1).SetIndex(2, 400);
 	adjMatrix.GetIndex(1).SetIndex(3, 300);
-	adjMatrix.GetIndex(1).SetIndex(4, 193);
+	adjMatrix.GetIndex(1).SetIndex(4, 293);
 
 	adjMatrix.GetIndex(2).SetIndex(0, 180);
 	adjMatrix.GetIndex(2).SetIndex(1, 400);
@@ -453,7 +452,7 @@ int main() {
 	
 
 	adjMatrix.GetIndex(4).SetIndex(0, 234);
-	adjMatrix.GetIndex(4).SetIndex(1, 193);
+	adjMatrix.GetIndex(4).SetIndex(1, 293);
 	adjMatrix.GetIndex(4).SetIndex(2, 312);
 	adjMatrix.GetIndex(4).SetIndex(3, 215);
 	adjMatrix.GetIndex(4).SetIndex(4, 0);
