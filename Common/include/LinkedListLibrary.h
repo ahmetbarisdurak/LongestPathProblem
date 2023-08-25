@@ -92,6 +92,25 @@ public:
 	bool Insert(LinkedListIterator pos, const T& element);
 	bool Erase(LinkedListIterator& pos);
 	LinkedListIterator GetIterator();
+	
+	// Assignment operator
+	LinkedList& operator=(LinkedList& other) {
+		if (this == &other) {
+			return *this; // Self-assignment check
+		}
+
+		// Clear the current list
+		Clear();
+
+		LinkedList<T, N>::LinkedListIterator otherIterator = other.GetIterator();
+		while (otherIterator.HasNext()) {
+			PushBack(otherIterator.Next());
+		}
+
+		return *this;
+	}
+
+
 };
 
 template <class T>

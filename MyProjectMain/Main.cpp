@@ -372,7 +372,7 @@ void readCSVFile(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& cityDi
 
 
 }
-
+/*
 int dfs(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, StaticVector<bool, CITY_COUNT>& visited, int vertex, int pathLength, LinkedList<int, CITY_COUNT>& visitOrder) {
 	visited.SetIndex(vertex, true); // Set index as visited
 	visitOrder.PushBack(vertex);
@@ -403,7 +403,38 @@ int dfs(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, Stat
 	}
 
 	return longestPath;
+}*/
+
+LinkedList<int, CITY_COUNT> dfs(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, StaticVector<bool, CITY_COUNT>& visited, int currentVertex) {
+	visited.SetIndex(currentVertex, true); // Set index as visited
+	LinkedList<int, CITY_COUNT> longestPath;
+
+	cout << "longest path size is " << longestPath.GetSize();
+		 
+	for (int neighbor = 0; neighbor < CITY_COUNT; ++neighbor) {
+		if (adjMatrix.GetIndex(currentVertex).GetIndex(neighbor) >= (DISTANCE - TOLERANCE) && adjMatrix.GetIndex(currentVertex).GetIndex(neighbor) <= (DISTANCE + TOLERANCE) && !visited.GetIndex(neighbor)) {
+
+
+			LinkedList<int, CITY_COUNT> neighborPath = dfs(adjMatrix, visited, neighbor);
+
+			if (neighborPath.GetSize() > longestPath.GetSize()) { // finding the max componenet size and it's visiting order
+
+				longestPath.Clear();
+
+				LinkedList<int, CITY_COUNT>::LinkedListIterator llIterator = neighborPath.GetIterator();
+
+				while (llIterator.HasNext()) {
+					longestPath.PushBack(llIterator.Next());
+				}
+			}
+		}
+	}
+	
+	longestPath.Insert(longestPath.GetIterator(), currentVertex);
+	longestPath.PrintValues();
+	return longestPath;
 }
+
 
 int findMaxConnectedVertices(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix) {
 	
@@ -414,11 +445,15 @@ int findMaxConnectedVertices(StaticVector<StaticVector<int, CITY_COUNT>, CITY_CO
 	int maxConnected = 0;
 	int startVertex = 5; // city plate number
 
-	maxConnected = dfs(adjMatrix, visited, startVertex, 1, visitOrder);
+	visitOrder = dfs(adjMatrix, visited, startVertex);
 
 	std::cout << "Max connected is " << maxConnected << endl;
 	
+	cout << "Found the final values " << endl;
+
 	visitOrder.PrintValues();
+
+	cout << "Size of the final values are: " << visitOrder.GetSize() << endl;
 
 	return maxConnected;
 }
@@ -427,37 +462,62 @@ int main() {
 	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> adjMatrix;
 	
 	adjMatrix.GetIndex(0).SetIndex(0, 0);
-	adjMatrix.GetIndex(0).SetIndex(1, 230);
-	adjMatrix.GetIndex(0).SetIndex(2, 180);
-	adjMatrix.GetIndex(0).SetIndex(3, 711);
-	adjMatrix.GetIndex(0).SetIndex(4, 234);
+	adjMatrix.GetIndex(0).SetIndex(1, 200);
+	adjMatrix.GetIndex(0).SetIndex(2, 200);
+	adjMatrix.GetIndex(0).SetIndex(3, 0);
+	adjMatrix.GetIndex(0).SetIndex(4, 200);
+	adjMatrix.GetIndex(0).SetIndex(5, 0);
+	adjMatrix.GetIndex(0).SetIndex(6, 0);
 
-	adjMatrix.GetIndex(1).SetIndex(0, 230);
+	adjMatrix.GetIndex(1).SetIndex(0, 200);
 	adjMatrix.GetIndex(1).SetIndex(1, 0);
-	adjMatrix.GetIndex(1).SetIndex(2, 400);
-	adjMatrix.GetIndex(1).SetIndex(3, 300);
-	adjMatrix.GetIndex(1).SetIndex(4, 293);
+	adjMatrix.GetIndex(1).SetIndex(2, 0);
+	adjMatrix.GetIndex(1).SetIndex(3, 0);
+	adjMatrix.GetIndex(1).SetIndex(4, 0);
+	adjMatrix.GetIndex(1).SetIndex(5, 0);
+	adjMatrix.GetIndex(1).SetIndex(6, 0);
 
-	adjMatrix.GetIndex(2).SetIndex(0, 180);
-	adjMatrix.GetIndex(2).SetIndex(1, 400);
+	adjMatrix.GetIndex(2).SetIndex(0, 200);
+	adjMatrix.GetIndex(2).SetIndex(1, 0);
 	adjMatrix.GetIndex(2).SetIndex(2, 0);
-	adjMatrix.GetIndex(2).SetIndex(3, 230);
-	adjMatrix.GetIndex(2).SetIndex(4, 312);
+	adjMatrix.GetIndex(2).SetIndex(3, 200);
+	adjMatrix.GetIndex(2).SetIndex(4, 0);
+	adjMatrix.GetIndex(2).SetIndex(5, 0);
+	adjMatrix.GetIndex(2).SetIndex(6, 0);
 
-	adjMatrix.GetIndex(3).SetIndex(0, 711);
-	adjMatrix.GetIndex(3).SetIndex(1, 300);
-	adjMatrix.GetIndex(3).SetIndex(2, 230);
+	adjMatrix.GetIndex(3).SetIndex(0, 0);
+	adjMatrix.GetIndex(3).SetIndex(1, 0);
+	adjMatrix.GetIndex(3).SetIndex(2, 200);
 	adjMatrix.GetIndex(3).SetIndex(3, 0);
-	adjMatrix.GetIndex(3).SetIndex(4, 215);
-	
+	adjMatrix.GetIndex(3).SetIndex(4, 0);
+	adjMatrix.GetIndex(3).SetIndex(5, 0);
+	adjMatrix.GetIndex(3).SetIndex(6, 0);
 
-	adjMatrix.GetIndex(4).SetIndex(0, 234);
-	adjMatrix.GetIndex(4).SetIndex(1, 293);
-	adjMatrix.GetIndex(4).SetIndex(2, 312);
-	adjMatrix.GetIndex(4).SetIndex(3, 215);
+	adjMatrix.GetIndex(4).SetIndex(0, 200);
+	adjMatrix.GetIndex(4).SetIndex(1, 0);
+	adjMatrix.GetIndex(4).SetIndex(2, 0);
+	adjMatrix.GetIndex(4).SetIndex(3, 0);
 	adjMatrix.GetIndex(4).SetIndex(4, 0);
+	adjMatrix.GetIndex(4).SetIndex(5, 200);
+	adjMatrix.GetIndex(4).SetIndex(6, 0);
 
-	
+	adjMatrix.GetIndex(5).SetIndex(0, 0);
+	adjMatrix.GetIndex(5).SetIndex(1, 0);
+	adjMatrix.GetIndex(5).SetIndex(2, 0);
+	adjMatrix.GetIndex(5).SetIndex(3, 0);
+	adjMatrix.GetIndex(5).SetIndex(4, 200);
+	adjMatrix.GetIndex(5).SetIndex(5, 0);
+	adjMatrix.GetIndex(5).SetIndex(6, 200);
+   
+	adjMatrix.GetIndex(6).SetIndex(0, 0);
+	adjMatrix.GetIndex(6).SetIndex(1, 0);
+	adjMatrix.GetIndex(6).SetIndex(2, 0);
+	adjMatrix.GetIndex(6).SetIndex(3, 0);
+	adjMatrix.GetIndex(6).SetIndex(4, 0);
+	adjMatrix.GetIndex(6).SetIndex(5, 200);
+	adjMatrix.GetIndex(6).SetIndex(6, 0);
+
+
 	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> cityDistances;
 	StaticVector<std::string, CITY_COUNT> cityNames;
 
