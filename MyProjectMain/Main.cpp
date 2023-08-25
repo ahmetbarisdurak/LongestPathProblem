@@ -408,8 +408,6 @@ int dfs(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, Stat
 LinkedList<int, CITY_COUNT> dfs(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, StaticVector<bool, CITY_COUNT>& visited, int currentVertex) {
 	visited.SetIndex(currentVertex, true); // Set index as visited
 	LinkedList<int, CITY_COUNT> longestPath;
-
-	cout << "longest path size is " << longestPath.GetSize();
 		 
 	for (int neighbor = 0; neighbor < CITY_COUNT; ++neighbor) {
 		if (adjMatrix.GetIndex(currentVertex).GetIndex(neighbor) >= (DISTANCE - TOLERANCE) && adjMatrix.GetIndex(currentVertex).GetIndex(neighbor) <= (DISTANCE + TOLERANCE) && !visited.GetIndex(neighbor)) {
@@ -431,10 +429,9 @@ LinkedList<int, CITY_COUNT> dfs(StaticVector<StaticVector<int, CITY_COUNT>, CITY
 	}
 	
 	longestPath.Insert(longestPath.GetIterator(), currentVertex);
-	longestPath.PrintValues();
+	//longestPath.PrintValues();
 	return longestPath;
 }
-
 
 int findMaxConnectedVertices(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix) {
 	
@@ -443,8 +440,20 @@ int findMaxConnectedVertices(StaticVector<StaticVector<int, CITY_COUNT>, CITY_CO
 
 
 	int maxConnected = 0;
-	int startVertex = 5; // city plate number
+	int startVertex = 0; // city plate number
 
+	for (startVertex = 0; startVertex < CITY_COUNT; ++startVertex) {
+
+		StaticVector<bool, CITY_COUNT> visited(false);
+
+		visitOrder = dfs(adjMatrix, visited, startVertex);
+
+		cout << "Size of the final values are: " << visitOrder.GetSize() << endl;
+	}
+
+
+
+	/*
 	visitOrder = dfs(adjMatrix, visited, startVertex);
 
 	std::cout << "Max connected is " << maxConnected << endl;
@@ -454,28 +463,49 @@ int findMaxConnectedVertices(StaticVector<StaticVector<int, CITY_COUNT>, CITY_CO
 	visitOrder.PrintValues();
 
 	cout << "Size of the final values are: " << visitOrder.GetSize() << endl;
-
+	*/
 	return maxConnected;
 }
+
+void findLongestPath(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, int startCity, vector<bool>& visitedCities, int currentDistance, vector<int>& currentPath, int& maxDistance, vector<int>& maxPath) {
+	visitedCities[startCity] = true;
+	currentPath.push_back(startCity);
+
+	if (currentDistance > maxDistance) {
+		maxDistance = currentDistance;
+		maxPath = currentPath;
+	}
+
+	for (int city = 0; city < CITY_COUNT; ++city) {
+		if (!visitedCities[city] && adjMatrix.GetIndex(startCity).GetIndex(city) >= DISTANCE - TOLERANCE && adjMatrix.GetIndex(startCity).GetIndex(city) <= DISTANCE + TOLERANCE) {
+			int newDistance = currentDistance + 1;
+			vector<int> newPath = currentPath;
+
+			findLongestPath(adjMatrix, city, visitedCities, newDistance, newPath, maxDistance, maxPath);
+		}
+	}
+
+}
+
 
 int main() {
 	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> adjMatrix;
 	
 	adjMatrix.GetIndex(0).SetIndex(0, 0);
-	adjMatrix.GetIndex(0).SetIndex(1, 200);
+	adjMatrix.GetIndex(0).SetIndex(1, 0);
 	adjMatrix.GetIndex(0).SetIndex(2, 200);
 	adjMatrix.GetIndex(0).SetIndex(3, 0);
 	adjMatrix.GetIndex(0).SetIndex(4, 200);
 	adjMatrix.GetIndex(0).SetIndex(5, 0);
-	adjMatrix.GetIndex(0).SetIndex(6, 0);
+	adjMatrix.GetIndex(0).SetIndex(6, 200);
 
-	adjMatrix.GetIndex(1).SetIndex(0, 200);
-	adjMatrix.GetIndex(1).SetIndex(1, 0);
-	adjMatrix.GetIndex(1).SetIndex(2, 0);
-	adjMatrix.GetIndex(1).SetIndex(3, 0);
-	adjMatrix.GetIndex(1).SetIndex(4, 0);
-	adjMatrix.GetIndex(1).SetIndex(5, 0);
-	adjMatrix.GetIndex(1).SetIndex(6, 0);
+	adjMatrix.GetIndex(6).SetIndex(0, 200);
+	adjMatrix.GetIndex(6).SetIndex(1, 0);
+	adjMatrix.GetIndex(6).SetIndex(2, 0);
+	adjMatrix.GetIndex(6).SetIndex(3, 0);
+	adjMatrix.GetIndex(6).SetIndex(4, 0);
+	adjMatrix.GetIndex(6).SetIndex(5, 0);
+	adjMatrix.GetIndex(6).SetIndex(6, 0);
 
 	adjMatrix.GetIndex(2).SetIndex(0, 200);
 	adjMatrix.GetIndex(2).SetIndex(1, 0);
@@ -502,20 +532,20 @@ int main() {
 	adjMatrix.GetIndex(4).SetIndex(6, 0);
 
 	adjMatrix.GetIndex(5).SetIndex(0, 0);
-	adjMatrix.GetIndex(5).SetIndex(1, 0);
+	adjMatrix.GetIndex(5).SetIndex(1, 200);
 	adjMatrix.GetIndex(5).SetIndex(2, 0);
 	adjMatrix.GetIndex(5).SetIndex(3, 0);
 	adjMatrix.GetIndex(5).SetIndex(4, 200);
 	adjMatrix.GetIndex(5).SetIndex(5, 0);
-	adjMatrix.GetIndex(5).SetIndex(6, 200);
+	adjMatrix.GetIndex(5).SetIndex(6, 0);
    
-	adjMatrix.GetIndex(6).SetIndex(0, 0);
-	adjMatrix.GetIndex(6).SetIndex(1, 0);
-	adjMatrix.GetIndex(6).SetIndex(2, 0);
-	adjMatrix.GetIndex(6).SetIndex(3, 0);
-	adjMatrix.GetIndex(6).SetIndex(4, 0);
-	adjMatrix.GetIndex(6).SetIndex(5, 200);
-	adjMatrix.GetIndex(6).SetIndex(6, 0);
+	adjMatrix.GetIndex(1).SetIndex(0, 0);
+	adjMatrix.GetIndex(1).SetIndex(1, 0);
+	adjMatrix.GetIndex(1).SetIndex(2, 0);
+	adjMatrix.GetIndex(1).SetIndex(3, 0);
+	adjMatrix.GetIndex(1).SetIndex(4, 0);
+	adjMatrix.GetIndex(1).SetIndex(5, 200);
+	adjMatrix.GetIndex(1).SetIndex(6, 0);
 
 
 	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> cityDistances;
@@ -524,7 +554,30 @@ int main() {
 	readCSVFile(cityDistances, cityNames);
 	
 
-	 findMaxConnectedVertices(cityDistances);  // Output should be 3
+	findMaxConnectedVertices(cityDistances);  // Output should be 3
+	/*
+	
+	int startCity = 0;  // Replace with the index of your starting city
+	int numCities = CITY_COUNT;
+
+	vector<bool> visitedCities(numCities, false);
+	int initialDistance = 0;
+	vector<int> initialPath;
+
+	int longestDistance = 0;
+	vector<int> longestPath;
+
+	findLongestPath(adjMatrix, startCity, visitedCities, initialDistance, initialPath, longestDistance, longestPath);
+	int i = 0;
+	cout << "Longest Path:";
+	for (int city : longestPath) {
+		cout << " " << city;
+		i++;
+	}
+	cout << endl;
+	cout << " i is " << i << endl;
+	cout << "Longest Distance: " << longestDistance << endl;
+	*/
 
 	return 0;
 }
