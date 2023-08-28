@@ -7,13 +7,13 @@
 
 using namespace std;
 
-#define CITY_COUNT 81 // 81
+#define CITY_COUNT 7 // 81
 #define START 0
 #define DISTANCE 200
 #define TOLERANCE 50
 
 
-#define POPULATION_SIZE 100 // ? 100
+#define POPULATION_SIZE 50 // ? 100
 
 
 // Genetic algorithm parameters
@@ -251,8 +251,8 @@ StaticVector<T, N> GeneticAlgorithm(StaticVector<StaticVector<T, N>, N>& adjMatr
     struct IndividualPath<T, N> tempPath;
     StaticVector<T, N> tempGnome;
 
-    cout << "Printing the gnomes and their fitness scores" << endl;
-    cout << "Creating random gnomes for population" << endl;
+    //cout << "Printing the gnomes and their fitness scores" << endl;
+    //cout << "Creating random gnomes for population" << endl;
     // Populating the GNOME pool.
     
     for (int i = 0; i < POPULATION_SIZE; i++) {
@@ -260,21 +260,20 @@ StaticVector<T, N> GeneticAlgorithm(StaticVector<StaticVector<T, N>, N>& adjMatr
         //StaticVector<T, N> tempGnome;
         tempGnome = CreateGnome<T, N>();
         tempPath.gnome = tempGnome;
-        cout << "Gnome is: " << endl;
-        tempPath.gnome.PrintData();
+        //cout << "Gnome is: " << endl;
+        //tempPath.gnome.PrintData();
         tempPath.fitnessScore = CalculateFitness(tempPath.gnome, adjMatrix);
-        cout << "Fitness score is: " << tempPath.fitnessScore << endl;
+        //cout << "Fitness score is: " << tempPath.fitnessScore << endl;
         population.PushBack(tempPath);
     }
 
     
-    cout << "\nInitial population: " << endl
-        << "GNOME     FITNESS VALUE\n";
+    //cout << "\nInitial population: " << endl
+        //<< "GNOME     FITNESS VALUE\n";
     for (int i = 0; i < POPULATION_SIZE; i++) {
-        cout << "Gnome is: " << endl;
-        population.GetIndex(i).gnome.PrintData();
-        cout << "Fitness score is: " << population.GetIndex(i).fitnessScore << endl;
-        cout << "\n";
+        //cout << "Gnome is: " << endl;
+        //population.GetIndex(i).gnome.PrintData();
+       // cout << "Fitness score is: " << population.GetIndex(i).fitnessScore << endl;
     }
     
     
@@ -287,7 +286,7 @@ StaticVector<T, N> GeneticAlgorithm(StaticVector<StaticVector<T, N>, N>& adjMatr
         population.Sort(ComparePathsByFitnessScore); // Sort population with fitness scores
         StaticVector<struct IndividualPath<T, N>, POPULATION_SIZE> newPopulation;
 
-        cout << "Starting to mutate genes" << endl;
+        //cout << "Starting to mutate genes" << endl;
         /*
         for (int i = 0; i < POPULATION_SIZE; i++) {
             struct IndividualPath<T, N> p1 = population.GetIndex(i);
@@ -320,7 +319,7 @@ StaticVector<T, N> GeneticAlgorithm(StaticVector<StaticVector<T, N>, N>& adjMatr
         }
         */
         
-        cout << "Starting to crossover" << endl;
+        //cout << "Starting to crossover" << endl;
 
         for (int i = 0; i < POPULATION_SIZE; i++)
         {
@@ -332,7 +331,7 @@ StaticVector<T, N> GeneticAlgorithm(StaticVector<StaticVector<T, N>, N>& adjMatr
 
             struct IndividualPath<T, N> offspring;
             offspring.gnome = newGnome;
-            cout << "Calculating fitness score" << endl;
+            //cout << "Calculating fitness score" << endl;
             offspring.fitnessScore = CalculateFitness<T, N>(offspring.gnome, adjMatrix);
 
             newPopulation.PushBack(offspring);
@@ -341,28 +340,28 @@ StaticVector<T, N> GeneticAlgorithm(StaticVector<StaticVector<T, N>, N>& adjMatr
 
         //temperature = Cooldown(temperature);
         //population = newPopulation;
-        cout << "Generation " << gen << " \n";
-        cout << "GNOME     FITNESS VALUE\n";
+        //cout << "Generation " << gen << " \n";
+        //cout << "GNOME     FITNESS VALUE\n";
 
         for (int i = 0; i < POPULATION_SIZE; i++) {
-            cout << "Gnome is: ";
+            //cout << "Gnome is: ";
             //newPopulation.GetIndex(i).gnome.PrintData();
-            cout << " Fitness score is: " << newPopulation.GetIndex(i).fitnessScore << endl;
+            //cout << " Fitness score is: " << newPopulation.GetIndex(i).fitnessScore << endl;
         }
         gen++;
 
         if (!(gen <= genThreshold)) {
-            cout << "--------------------" << endl;
-            cout << "Found the best one " << endl;
-            cout << "--------------------" << endl;
+            //cout << "--------------------" << endl;
+            //cout << "Found the best one " << endl;
+            //cout << "--------------------" << endl;
 
             newPopulation.Sort(ComparePathsByFitnessScore);
 
-            for (int i = 0; i < POPULATION_SIZE; i++) {
-                cout << "Gnome is: ";
-                //newPopulation.GetIndex(i).gnome.PrintData();
-                cout << " Fitness score is: " << newPopulation.GetIndex(i).fitnessScore << endl;
-            }
+            //for (int i = 0; i < POPULATION_SIZE; i++) {
+               // cout << "Gnome is: ";
+                newPopulation.GetIndex(0).gnome.PrintData();
+                cout << " Fitness score is: " << newPopulation.GetIndex(0).fitnessScore << endl;
+            //}
         }
     }
     
@@ -375,8 +374,8 @@ int GeneticAlgorithmUtil(StaticVector<StaticVector<T, N>, N>& adjMatrix) {
 
     // Call the genetic algorithm
     //StaticVector<T, N> bestSolution = GeneticAlgorithm<T, N>(adjMatrix);
-
-    GeneticAlgorithm<T, N>(adjMatrix);
+    //for(int i = 0; i < 10; i++)
+        GeneticAlgorithm<T, N>(adjMatrix);
 
     // Print the best solution
     /*
