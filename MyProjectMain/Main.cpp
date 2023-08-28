@@ -6,12 +6,14 @@
 #include <gtest/gtest.h>
 #include <fstream>
 #include <string>
+#include "GeneticAlgorithm.cpp"
 
 using namespace std;
 
 #define DISTANCE 200
 #define TOLERANCE 50
-#define CITY_COUNT 81
+#define CITY_COUNT 81 // 81
+#define START 0
 
 class StaticVectorTest : public ::testing::Test {
 protected:
@@ -31,7 +33,6 @@ protected:
 	void TearDown() override {
 	}
 };
-
 
 // Test case for PushBack and GetSize methods
 TEST_F(StaticVectorTest, PushBackAndGetSize) {
@@ -433,14 +434,12 @@ LinkedList<int, CITY_COUNT> dfs(StaticVector<StaticVector<int, CITY_COUNT>, CITY
 	return longestPath;
 }
 
-int findMaxConnectedVertices(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix) {
+void findMaxConnectedVertices(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix) {
 	
 	StaticVector<bool, CITY_COUNT> visited(false);
 	LinkedList<int, CITY_COUNT> visitOrder;
 
-
-	int maxConnected = 0;
-	int startVertex = 0; // city plate number
+	int startVertex = START; // city plate number
 
 	for (startVertex = 0; startVertex < CITY_COUNT; ++startVertex) {
 
@@ -450,8 +449,6 @@ int findMaxConnectedVertices(StaticVector<StaticVector<int, CITY_COUNT>, CITY_CO
 
 		cout << "Size of the final values are: " << visitOrder.GetSize() << endl;
 	}
-
-
 
 	/*
 	visitOrder = dfs(adjMatrix, visited, startVertex);
@@ -464,7 +461,6 @@ int findMaxConnectedVertices(StaticVector<StaticVector<int, CITY_COUNT>, CITY_CO
 
 	cout << "Size of the final values are: " << visitOrder.GetSize() << endl;
 	*/
-	return maxConnected;
 }
 
 void findLongestPath(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, int startCity, vector<bool>& visitedCities, int currentDistance, vector<int>& currentPath, int& maxDistance, vector<int>& maxPath) {
@@ -554,7 +550,11 @@ int main() {
 	readCSVFile(cityDistances, cityNames);
 	
 
-	findMaxConnectedVertices(cityDistances);  // Output should be 3
+	GeneticAlgorithmUtil<int, CITY_COUNT>(cityDistances);
+
+
+	//findMaxConnectedVertices(adjMatrix);  // Output should be 3
+
 	/*
 	
 	int startCity = 0;  // Replace with the index of your starting city
@@ -578,6 +578,7 @@ int main() {
 	cout << " i is " << i << endl;
 	cout << "Longest Distance: " << longestDistance << endl;
 	*/
+
 
 	return 0;
 }

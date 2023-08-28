@@ -88,6 +88,16 @@ public:
 
 	};
 
+	StaticVector& operator=(const StaticVector& other) {
+		if (this != &other) {
+			size = other.size;
+			for (int i = 0; i < size; ++i) {
+				staticVectorData[i] = other.staticVectorData[i];
+			}
+		}
+		return *this;
+	}
+
 	// Starts iterator index from the beginning of the vector
 	StaticVectorIterator Begin();
 
@@ -96,6 +106,8 @@ public:
 
 	// Starts iterator with first index as general
 	StaticVectorIterator GetIterator();
+
+	void Sort(bool (*comparisonFunction)(const T&, const T&));
 
 private:
 	const int capacity = N;
@@ -189,4 +201,28 @@ typename StaticVector<T, N>::StaticVectorIterator StaticVector<T, N>::GetIterato
 	return StaticVectorIterator(size, staticVectorData);
 }
 
+template <class T>
+bool operator<(const T& lhs, const T& rhs) {
+	if (lhs < rhs)
+		return true;
+	return false;
+}
+
+template <class T , unsigned int N>
+void StaticVector<T, N>::Sort(bool (*comparisonFunction)(const T&, const T&)) {
+
+	int i, j;
+	T key;
+	for (i = 1; i < N; i++) {
+		key = staticVectorData[i];
+		j = i - 1;
+
+		while (j >= 0 && comparisonFunction(staticVectorData[j], key) ) {
+			staticVectorData[j + 1] = staticVectorData[j];
+			j = j - 1;
+		}
+		staticVectorData[j + 1] = key;
+	}
+
+}
 
