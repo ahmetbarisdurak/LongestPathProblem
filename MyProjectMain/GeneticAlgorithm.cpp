@@ -13,7 +13,7 @@ using namespace std;
 #define TOLERANCE 50
 
 
-#define POPULATION_SIZE 50 // ? 100
+#define POPULATION_SIZE 15 // ? 100
 
 
 // Genetic algorithm parameters
@@ -111,20 +111,64 @@ bool Repeat(StaticVector<T,N>& gnome, T temp) {
 }
 
 template <class T, unsigned int N>
-StaticVector<T, N> CreateGnome() {
+int FindMostNeighborIndex(int startingIndex, StaticVector<T, N> tempGnome, StaticVector<StaticVector<T, N>, N>& adjMatrix) {
+
+    int mostNeighbor = 0;
+    int mostNeighborIndex = -1;
+
+    for (int i = 0; i < N; i++) {
+        
+        int temp = 0;
+        if (!Repeat(tempGnome, i) && adjMatrix.GetIndex(startingIndex).GetIndex(i) <= DISTANCE + TOLERANCE && adjMatrix.GetIndex(startingIndex).GetIndex(i) >= DISTANCE - TOLERANCE) {
+            for (int j = 0; j < N; j++) {
+                if (adjMatrix.GetIndex(i).GetIndex(j) <= DISTANCE + TOLERANCE && adjMatrix.GetIndex(i).GetIndex(j) >= DISTANCE - TOLERANCE)
+                    temp++;
+
+            }
+        }
+
+        if (temp > mostNeighbor) {
+            mostNeighbor = temp;
+            mostNeighborIndex = i;
+        }
+
+    }
+
+
+    return mostNeighborIndex;
+
+}
+
+
+template <class T, unsigned int N>
+StaticVector<T, N> CreateGnome(StaticVector<StaticVector<T, N>, N>& adjMatrix) {
     int gnomeSize = RandNum(2, N);
+
+    // Creating gnome using the neighbor's neighbor method
+    // Selecting the neighbor which has the most neighbors
     StaticVector<T, N> tempGnome;
     tempGnome.PushBack(START);
 
-    while (true) {
-        if (tempGnome.GetSize() == gnomeSize)
-            break;
-        
-        T randomElement = RandNum(0, N);
-        if (!Repeat(tempGnome, randomElement))
-            tempGnome.PushBack(randomElement);
+    for (int i = 0; i < gnomeSize; i++) {
+        int mostNeighborIndex = FindMostNeighborIndex(tempGnome.GetIndex(i), tempGnome, adjMatrix);
+
+        if (mostNeighborIndex == -1) {
+            // add a random neighbor which is not in gnome
+            while (true) {
+
+                T randomElement = RandNum(0, N);
+                if (!Repeat(tempGnome, randomElement)) {
+                    tempGnome.PushBack(randomElement);
+                    break;
+                }
+            }
+
+        }
+        else
+            tempGnome.PushBack(mostNeighborIndex);
+
     }
-    
+
     return tempGnome;
 }
 
@@ -172,7 +216,7 @@ StaticVector<T, N> Mate(IndividualPath<T, N> parent1, IndividualPath<T, N> paren
         T temp;
         // if prob is less than 0.45, insert gene
         // from parent 1 
-        if (p < 0.45) {
+        if (p < 0.35) {
 
             if (parent1.gnome.GetSize() <= i) {
                 temp = RandomGene<T>();
@@ -191,7 +235,7 @@ StaticVector<T, N> Mate(IndividualPath<T, N> parent1, IndividualPath<T, N> paren
         }
         // if prob is between 0.45 and 0.90, insert
         // gene from parent 2
-        else if (p < 0.90) {
+        else if (p < 0.60) {
             if (parent2.gnome.GetSize() <= i) {
                 temp = RandomGene<T>();
                 if (!Repeat(childGnome, temp)) {
@@ -216,8 +260,6 @@ StaticVector<T, N> Mate(IndividualPath<T, N> parent1, IndividualPath<T, N> paren
         }
         // otherwise insert random gene(mutate), 
         // for maintaining diversity
-        //else
-          //  child_chromosome += mutated_genes(); baþka bir mutasyon örneði
     }
 
     return childGnome;
@@ -251,14 +293,14 @@ StaticVector<T, N> GeneticAlgorithm(StaticVector<StaticVector<T, N>, N>& adjMatr
     struct IndividualPath<T, N> tempPath;
     StaticVector<T, N> tempGnome;
 
-    //cout << "Printing the gnomes and their fitness scores" << endl;
-    //cout << "Creating random gnomes for population" << endl;
+    cout << "Printing the gnomes and their fitness scores" << endl;
+    cout << "Creating random gnomes for population" << endl;
     // Populating the GNOME pool.
     
     for (int i = 0; i < POPULATION_SIZE; i++) {
         //struct IndividualPath<T, N> tempPath;
         //StaticVector<T, N> tempGnome;
-        tempGnome = CreateGnome<T, N>();
+        tempGnome = CreateGnome<T, N>(adjMatrix);
         tempPath.gnome = tempGnome;
         //cout << "Gnome is: " << endl;
         //tempPath.gnome.PrintData();
@@ -268,12 +310,12 @@ StaticVector<T, N> GeneticAlgorithm(StaticVector<StaticVector<T, N>, N>& adjMatr
     }
 
     
-    //cout << "\nInitial population: " << endl
-        //<< "GNOME     FITNESS VALUE\n";
+    cout << "\nInitial population: " << endl
+        << "GNOME     FITNESS VALUE\n";
     for (int i = 0; i < POPULATION_SIZE; i++) {
-        //cout << "Gnome is: " << endl;
-        //population.GetIndex(i).gnome.PrintData();
-       // cout << "Fitness score is: " << population.GetIndex(i).fitnessScore << endl;
+        cout << "Gnome is: " << endl;
+        population.GetIndex(i).gnome.PrintData();
+        cout << "Fitness score is: " << population.GetIndex(i).fitnessScore << endl;
     }
     
     
@@ -360,6 +402,7 @@ StaticVector<T, N> GeneticAlgorithm(StaticVector<StaticVector<T, N>, N>& adjMatr
             //for (int i = 0; i < POPULATION_SIZE; i++) {
                // cout << "Gnome is: ";
                 newPopulation.GetIndex(0).gnome.PrintData();
+                cout << "Best of the best" << endl;
                 cout << " Fitness score is: " << newPopulation.GetIndex(0).fitnessScore << endl;
             //}
         }
