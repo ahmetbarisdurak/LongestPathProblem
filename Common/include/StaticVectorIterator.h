@@ -8,6 +8,7 @@ private:
 	T* vectorData;
 	template<typename U, unsigned int N>
 	friend class StaticVector;
+
 public:
 	// For general iterator
 	StaticVectorIterator(int size, T* staticVectorData) : vectorSize(size), vectorData(staticVectorData) {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include<iostream>
-#include "LinkedListIterator.h"
+#include <LinkedListIterator.h>
 #include <ObjectPool.h>
 
 template <class T, unsigned int N>
@@ -10,6 +10,9 @@ protected:
 	Node<T>* first;
 	Node<T>* last;
 	int size;
+
+	template<typename U, unsigned int N>
+	friend class LinkedListIterator;
 	ObjectPool<Node<T>, N> nodePool;
 	
 public:
@@ -29,9 +32,25 @@ public:
 	// Operator Overloading
 	LinkedList<T, N>& operator=(LinkedList<T, N>& other);
 
-	friend std::ostream& operator<<(std::ostream& os, const LinkedList<T, N>& list);
+	template <class T, unsigned int N>
+	friend std::ostream& operator<< (std::ostream& os, LinkedList<T, N>& list);
 
+	
 };
+
+template <class T, unsigned N>
+std::ostream& operator<< (std::ostream& os, LinkedList<T, N>& list) {
+	if (list.first == NULL)
+		return os;
+
+	LinkedListIterator<T, N> temp = list.GetIterator();
+
+	while (temp.HasNext()) {
+		std::cout << temp.Next() << "->";
+	}
+
+	return os;
+}
 
 template <class T>
 Node<T>::Node() {
@@ -64,9 +83,12 @@ int LinkedList<T, N>::GetSize() {
 template <class T, unsigned int N>
 void LinkedList<T, N>::Clear() {
 
+	if (first == nullptr)
+		return;
+	
 	Node<T>* temp = first;
 
-	while (temp != NULL) {
+	while (temp->next != NULL) {
 		Node<T>* next = temp->next;
 		nodePool.Free(temp);
 		temp = next;
@@ -261,21 +283,4 @@ LinkedList<T, N>& LinkedList<T, N>::operator=(LinkedList<T, N>& other) {
 	}
 
 	return *this;
-}
-
-template <class T, unsigned int N>
-std::ostream& operator<<(std::ostream& os, LinkedList<T, N>& list) {
-	
-	if (list.first == NULL)
-		return;
-	//cout << "Linked list is empty" << endl;
-
-	Node<T>* temp = list.first;
-	//cout << "List is: " << endl;
-	while (temp != NULL) {
-		std::cout << temp->data << "->";
-		temp = temp->next;
-	}
-
-	return os;
 }

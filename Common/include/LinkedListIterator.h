@@ -8,6 +8,11 @@ private:
 	Node<T>* currentNode;
 	template<typename U, unsigned int N>
 	friend class LinkedList;
+
+
+	template<typename U>
+	friend class Node;
+
 public:
 	// For general iterator
 	LinkedListIterator(Node<T>* head) : first(head) {

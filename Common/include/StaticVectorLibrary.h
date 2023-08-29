@@ -48,7 +48,7 @@ public:
 	// Operator Overloading
 	StaticVector& operator=(const StaticVector& other);
 
-	friend std::ostream& operator<<(std::ostream& os, StaticVector<T, N>& list);
+	friend std::ostream& operator<<(std::ostream& os, const StaticVector<T, N>& list);
 
 private:
 	const int capacity = N;

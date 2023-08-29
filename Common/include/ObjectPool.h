@@ -78,7 +78,7 @@ bool ObjectPool<T, N>::Free(T* freedObject) {
 	for (int i = 0; i < N; i++) {
 		if (freedObject == &pool[i]) {
 			poolAvailability[i] = AVAILABLE;
-			pool[i] = T(); // Reset the values inside object
+			//pool[i] = T(); // Reset the values inside object
 			usedObjects--;
 
 			//cout << "Free is completed returning the value " << endl;
