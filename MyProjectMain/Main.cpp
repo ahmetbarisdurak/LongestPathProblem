@@ -12,10 +12,10 @@
 //#include <GeneticAlgorithm.h>
 
 
-#define DISTANCE 250
+#define DISTANCE 200
 #define TOLERANCE 50
-#define CITY_COUNT 7 // 81
-#define START 0
+#define CITY_COUNT 81 // 81
+#define START 5
 
 // Reading CSV file and writing into StaticVectors
 void readCSVFile(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& cityDistances, StaticVector<std::string, CITY_COUNT>& cityNames) {
@@ -104,8 +104,6 @@ LinkedList<int, CITY_COUNT> dfs(StaticVector<StaticVector<int, CITY_COUNT>, CITY
 
 			LinkedList<int, CITY_COUNT> neighborPath = dfs(adjMatrix, visited, neighbor);
 
-			//std::cout << "Neighbor Path " << neighborPath << std::endl;
-
 			if (neighborPath.GetSize() > longestPath.GetSize()) { // finding the max componenet size and it's visiting order
 
 				longestPath.Clear();
@@ -118,11 +116,8 @@ LinkedList<int, CITY_COUNT> dfs(StaticVector<StaticVector<int, CITY_COUNT>, CITY
 			}
 		}
 	}
-
 	longestPath.Insert(longestPath.GetIterator(), currentVertex); // Insertin the current vertex to start of the path
-	std::cout << "After Insertion" << std::endl;
-	std::cout << "Size of the longest path is " << longestPath.GetSize() << std::endl;
-	std::cout << longestPath << std::endl;
+	
 	return longestPath;
 }
 
@@ -131,21 +126,23 @@ void findMaxConnectedVertices(StaticVector<StaticVector<int, CITY_COUNT>, CITY_C
 	StaticVector<bool, CITY_COUNT> visited(false);
 	LinkedList<int, CITY_COUNT> visitOrder;
 
-	int startVertex = START; // city plate number
+	int startVertex = 80; // city plate number
 
-	/*
+	
 	for (startVertex = 0; startVertex < CITY_COUNT; ++startVertex) {
 
 		StaticVector<bool, CITY_COUNT> visited(false);
+		LinkedList<int, CITY_COUNT> visitOrder;
 
 		visitOrder = dfs(adjMatrix, visited, startVertex);
 
-		std::cout << visitOrder;
-
+		//if(startVertex == CITY_COUNT - 1)
+		std::cout << "Visit order is: " << std::endl;
+		//std::cout << visitOrder;
 
 		std::cout << "Size of the final values are: " << visitOrder.GetSize() << std::endl;
 	}
-	*/
+	/*
 	
 	visitOrder = dfs(adjMatrix, visited, startVertex);
 	
@@ -154,7 +151,7 @@ void findMaxConnectedVertices(StaticVector<StaticVector<int, CITY_COUNT>, CITY_C
 	std::cout << visitOrder << std::endl;
 
 	std::cout << "Size of the final values are: " << visitOrder.GetSize() << std::endl;
-	
+	*/
 }
 
 /*
@@ -250,31 +247,16 @@ int main() {
 	//RunTests();
 
 
-	//StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> cityDistances;
-	//StaticVector<std::string, CITY_COUNT> cityNames;
+	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> cityDistances;
+	StaticVector<std::string, CITY_COUNT> cityNames;
 
-	//readCSVFile(cityDistances, cityNames);
+	readCSVFile(cityDistances, cityNames);
 
 
 	//GeneticAlgorithmUtil<int, CITY_COUNT>(cityDistances);
 	
 
-	findMaxConnectedVertices(adjMatrix);  // Output should be 3
-
-	LinkedList<int, 6> linkedList;
-
-	linkedList.PushBack(1);
-	linkedList.PushBack(2);
-	linkedList.PushBack(3);
-	linkedList.PushBack(4);
-	linkedList.PushBack(5);
-
-	std::cout << linkedList << std::endl;
-
-	linkedList.Insert(linkedList.GetIterator(), 10);
-
-	std::cout << linkedList;
-
+	findMaxConnectedVertices(cityDistances);  // Output should be 3
 
 	/*
 	
