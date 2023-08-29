@@ -208,7 +208,7 @@ StaticVector<T, N> Mate(IndividualPath<T, N> parent1, IndividualPath<T, N> paren
         T temp;
         // if prob is less than 0.45, insert gene
         // from parent 1 
-        if (p < 0.35) {
+        if (p < 0.45) {
 
             if (parent1.gnome.GetSize() <= i) {
                 temp = RandomGene<T>();
@@ -227,7 +227,7 @@ StaticVector<T, N> Mate(IndividualPath<T, N> parent1, IndividualPath<T, N> paren
         }
         // if prob is between 0.45 and 0.90, insert
         // gene from parent 2
-        else if (p < 0.60) {
+        else if (p < 0.90) {
             if (parent2.gnome.GetSize() <= i) {
                 temp = RandomGene<T>();
                 if (!Repeat(childGnome, temp)) {
