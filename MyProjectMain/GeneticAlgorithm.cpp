@@ -7,20 +7,12 @@
 
 using namespace std;
 
-#define CITY_COUNT 7 // 81
-#define START 0
+#define CITY_COUNT 81 // 81
+#define START 5
 #define DISTANCE 200
 #define TOLERANCE 50
+#define POPULATION_SIZE 100 // ? 100
 
-
-#define POPULATION_SIZE 15 // ? 100
-
-
-// Genetic algorithm parameters
-const double mutationRate = 0.1;
-const int generations = 100;
-
-//StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> cityDistances;
 
 template <class T, unsigned int N>
 struct IndividualPath {

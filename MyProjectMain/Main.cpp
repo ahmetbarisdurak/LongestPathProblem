@@ -12,8 +12,8 @@ using namespace std;
 
 #define DISTANCE 200
 #define TOLERANCE 50
-#define CITY_COUNT 7 // 81
-#define START 0
+#define CITY_COUNT 81 // 81
+#define START 5
 
 class StaticVectorTest : public ::testing::Test {
 protected:
@@ -544,13 +544,13 @@ int main() {
 	adjMatrix.GetIndex(1).SetIndex(6, 0);
 
 
-	//StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> cityDistances;
-	//StaticVector<std::string, CITY_COUNT> cityNames;
+	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> cityDistances;
+	StaticVector<std::string, CITY_COUNT> cityNames;
 
-	//readCSVFile(cityDistances, cityNames);
+	readCSVFile(cityDistances, cityNames);
 	
 
-	GeneticAlgorithmUtil<int, CITY_COUNT>(adjMatrix);
+	GeneticAlgorithmUtil<int, CITY_COUNT>(cityDistances);
 
 
 	//findMaxConnectedVertices(adjMatrix);  // Output should be 3
