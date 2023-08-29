@@ -34,23 +34,6 @@ struct IndividualPath {
 
 };
 
-
-/*
-int fitness(const StaticVector<int, CITY_COUNT>& solution) {
-    int numCitiesVisited = 0;
-    StaticVector<bool, CITY_COUNT> visited(false);
-
-    for (int city : solution) {
-        if (!visited[city]) {
-            visited[city] = true;
-            numCitiesVisited++;
-        }
-    }
-
-    return numCitiesVisited;
-}
-*/
-
 // Function to return the fitness value of a gnome.
 // The fitness value is the path length
 // of the path represented by the GNOME.
@@ -165,13 +148,12 @@ StaticVector<T, N> CreateGnome(StaticVector<StaticVector<T, N>, N>& adjMatrix) {
 }
 
 // Function to return a mutated GNOME
-// Mutated GNOME is a string
 // with a random interchange
 // of two genes to create variation in species
 template <class T, unsigned int N>
 StaticVector<T, N> MutatedGene(StaticVector<T, N> gnome)
 {
-    if (gnome.GetSize() <= 2) // If gnome is empty, 1 char or 2 char don't change anyting "", "0", "02" doesn't changes
+    if (gnome.GetSize() <= 2) // If gnome is empty, gnome size with 1 or 2 doesn't change anything "", "0", "0->2" doesn't changes
         return gnome;
 
     while (true) {
@@ -193,14 +175,15 @@ T RandomGene() {
     return RandNum(0, CITY_COUNT);
 }
 
+// Mating two parents with each other according to probabilities
 template <class T, unsigned int N>
 StaticVector<T, N> Mate(IndividualPath<T, N> parent1, IndividualPath<T, N> parent2) {
 
     StaticVector<T, N> childGnome;
-    int childGnomeSize = (parent1.gnome.GetSize() + parent2.gnome.GetSize()) / 2; // Getting mean of parent1 and parent2
+    int childGnomeSize = (parent1.gnome.GetSize() + parent2.gnome.GetSize()) / 2; // Getting mean of parent1 and parent2 sizes
     int i = 0;
     float p = 0;
-    childGnome.PushBack(parent1.gnome.GetIndex(0)); // Start should be same
+    childGnome.PushBack(parent1.gnome.GetIndex(0)); // Start should be same for all offsprings
     i++;
     while(i < childGnomeSize) {
         

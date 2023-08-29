@@ -5,8 +5,6 @@
 #define AVAILABLE 1
 #define OCCUPIED 0
 
-using namespace std;
-
 template<class T, unsigned int N>
 class LinkedList;
 
@@ -17,6 +15,10 @@ private:
 	Node<T>* next;
 	template<typename U, unsigned int N>
 	friend class LinkedList;
+
+	template<typename U, unsigned int N>
+	friend class LinkedListIterator;
+
 
 public:
 	Node(); // Constructor of Node
@@ -76,6 +78,7 @@ bool ObjectPool<T, N>::Free(T* freedObject) {
 	for (int i = 0; i < N; i++) {
 		if (freedObject == &pool[i]) {
 			poolAvailability[i] = AVAILABLE;
+			pool[i] = T(); // Reset the values inside object
 			usedObjects--;
 
 			//cout << "Free is completed returning the value " << endl;

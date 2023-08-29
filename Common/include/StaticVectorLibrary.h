@@ -1,10 +1,9 @@
 #pragma once
 
-#include "iterator.h"
-
 #include<iostream>
+#include <ostream>
+#include "StaticVectorIterator.h"
 
-using namespace std;
 
 template <class T, unsigned int N>
 class StaticVector {
@@ -14,9 +13,6 @@ public:
 	StaticVector(T element);
 
 	~StaticVector() = default;
-
-	// Printing the elements of the vector
-	void PrintData();
 
 	// adding a new element at the end of the vector
 	bool PushBack(T element);
@@ -31,83 +27,28 @@ public:
 	T Last();
 
 	// returns the size of the vector
-	int GetSize();
+	const int GetSize();
 
 	T& GetIndex(int index);
 	
 	void SetIndex(int index, T element);
 
-	class StaticVectorIterator : public Iterator<T> {
-	private:
-		int currentIndex = 0;
-		int vectorSize;
-		T* vectorData;
-		template<typename U, unsigned int N>
-		friend class StaticVector;
-	public:
-		// For general iterator
-		StaticVectorIterator(int size, T* staticVectorData) : vectorSize(size), vectorData(staticVectorData) {
-		}
-
-		//  For specific iterator with given index
-		StaticVectorIterator(int index, int size, T* staticVectorData) :
-			currentIndex(index), vectorSize(size), vectorData(staticVectorData) {
-		}
-
-		// Checks if iterator has a next element or not
-		bool HasNext() {
-			if (currentIndex < vectorSize)
-				return true;
-
-			return false;
-		}
-
-		//Iterates through the next element and returns it
-		T Next() {
-			if (!HasNext())
-				return {};
-
-			return vectorData[currentIndex++];
-		}
-
-		// Checks if iterator has a previous element or not
-		bool HasPrev() {
-			if (currentIndex > 0)
-				return true;
-
-			return false;
-		}
-
-		//Iterates through the previous element and returns it
-		T Prev() {
-			if (!HasPrev())
-				return {};
-
-			return vectorData[--currentIndex];
-		}
-
-	};
-
-	StaticVector& operator=(const StaticVector& other) {
-		if (this != &other) {
-			size = other.size;
-			for (int i = 0; i < size; ++i) {
-				staticVectorData[i] = other.staticVectorData[i];
-			}
-		}
-		return *this;
-	}
-
 	// Starts iterator index from the beginning of the vector
-	StaticVectorIterator Begin();
+	StaticVectorIterator<T, N> Begin();
 
 	// Starts iterator index from the ending of the vector
-	StaticVectorIterator End();
+	StaticVectorIterator<T, N> End();
 
 	// Starts iterator with first index as general
-	StaticVectorIterator GetIterator();
+	StaticVectorIterator<T, N> GetIterator();
 
 	void Sort(bool (*comparisonFunction)(const T&, const T&));
+
+
+	// Operator Overloading
+	StaticVector& operator=(const StaticVector& other);
+
+	friend std::ostream& operator<<(std::ostream& os, StaticVector<T, N>& list);
 
 private:
 	const int capacity = N;
@@ -116,8 +57,8 @@ private:
 };
 
 template <class T, unsigned int N>
-StaticVector<T, N>::StaticVector() : size(0) {}
-
+StaticVector<T, N>::StaticVector() : size(0) {
+}
 
 template <class T, unsigned int N>
 StaticVector<T, N>::StaticVector(T element) {
@@ -127,11 +68,10 @@ StaticVector<T, N>::StaticVector(T element) {
 	}
 }
 
-
 template <class T, unsigned int N>
 bool StaticVector<T, N>::PushBack(T element) {
 	if (size >= capacity) {
-		cout << "Out of capacity" << endl;
+		std::cout << "Out of capacity" << std::endl;
 		return false;
 	}
 	else {
@@ -140,18 +80,17 @@ bool StaticVector<T, N>::PushBack(T element) {
 	}
 }
 
-
 template <class T, unsigned int N>
 T& StaticVector<T, N>::GetIndex(int index) {
 	return staticVectorData[index];
 }
-
 
 template <class T, unsigned int N>
 void StaticVector<T, N>::SetIndex(int index, T element) {
 	staticVectorData[index] = element;
 
 }
+
 template <class T, unsigned int N>
 bool StaticVector<T, N>::PopBack() {
 	if (size == 0)
@@ -163,7 +102,7 @@ bool StaticVector<T, N>::PopBack() {
 }
 
 template <class T, unsigned int N>
-int StaticVector<T, N>::GetSize() {
+const int StaticVector<T, N>::GetSize() {
 	return size;
 }
 
@@ -178,27 +117,19 @@ T StaticVector<T, N>::Last() {
 }
 
 template <class T, unsigned int N>
-void StaticVector<T, N>::PrintData() {
-	for (int i = 0; i < size; i++)
-		cout << staticVectorData[i] << " ";
-
-	cout << endl;
+StaticVectorIterator<T, N> StaticVector<T, N>::Begin() {
+	return StaticVectorIterator<T, N>(0, size, staticVectorData);
 }
 
 template <class T, unsigned int N>
-typename StaticVector<T, N>::StaticVectorIterator StaticVector<T, N>::Begin() {
-	return StaticVectorIterator(0, size, staticVectorData);
+StaticVectorIterator<T, N> StaticVector<T, N>::End() {
+	return StaticVectorIterator<T,N>(size, size, staticVectorData);
 }
 
 template <class T, unsigned int N>
-typename StaticVector<T, N>::StaticVectorIterator StaticVector<T, N>::End() {
-	return StaticVectorIterator(size, size, staticVectorData);
-}
-
-template <class T, unsigned int N>
-typename StaticVector<T, N>::StaticVectorIterator StaticVector<T, N>::GetIterator()
+StaticVectorIterator<T, N> StaticVector<T, N>::GetIterator()
 {
-	return StaticVectorIterator(size, staticVectorData);
+	return StaticVectorIterator<T,N>(size, staticVectorData);
 }
 
 template <class T>
@@ -226,3 +157,23 @@ void StaticVector<T, N>::Sort(bool (*comparisonFunction)(const T&, const T&)) {
 
 }
 
+template <class T, unsigned int N>
+StaticVector<T, N>& StaticVector<T, N>::operator=(const StaticVector& other) {
+	if (this != &other) {
+		size = other.size;
+		for (int i = 0; i < size; ++i) {
+			staticVectorData[i] = other.staticVectorData[i];
+		}
+	}
+	return *this;
+}
+
+template <class T, unsigned int N>
+std::ostream& operator<<(std::ostream& os, const StaticVector<T, N>& list) {
+	
+	for (int i = 0; i < list.GetSize(); i++)
+		std::cout << list.staticVectorData[i] << " ";
+
+	std::cout << std::endl;
+	return os;
+}

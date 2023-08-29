@@ -1,16 +1,12 @@
 #pragma once
 
-#include "iterator.h"
-
 #include<iostream>
+#include "LinkedListIterator.h"
 #include <ObjectPool.h>
-
-using namespace std;
-
 
 template <class T, unsigned int N>
 class LinkedList {
-private:
+protected:
 	Node<T>* first;
 	Node<T>* last;
 	int size;
@@ -24,92 +20,16 @@ public:
 	bool PopBack();
 	T Front();
 	T Back();
-	void PrintValues();
 	int GetSize();
 
-	class LinkedListIterator : public Iterator<T> {
-	private:
-		Node<T>* first;
-		Node<T>* currentNode;
-		template<typename U, unsigned int N>
-		friend class LinkedList;
-	public:
-		// For general iterator
-		LinkedListIterator(Node<T>* head) :  first(head) {
-			currentNode = head;
-		}
+	bool Insert(LinkedListIterator<T, N> pos, const T& element);
+	bool Erase(LinkedListIterator<T, N>& pos);
+	LinkedListIterator<T, N> GetIterator();
 
-		// Checks if iterator has a next element or not
-		bool HasNext() {
-			return currentNode != NULL;
-		}
+	// Operator Overloading
+	LinkedList<T, N>& operator=(LinkedList<T, N>& other);
 
-		//Iterates through the next element and returns it
-		T Next() {
-			if (!HasNext())
-				return {};
-			
-			T returnData = currentNode->data;
-			currentNode = currentNode->next;
-
-			return returnData;
-		}
-
-		// Checks if iterator has a previous element or not
-		bool HasPrev() {
-			if (currentNode == first)
-				return false;
-			/*
-			Node<T>* temp = first;
-
-			while (temp->next != currentNode) {
-				temp = temp->next;
-			}
-			*/
-
-			return true;
-		}
-
-		//Iterates through the previous element and returns it
-		T Prev() {
-			if (!HasPrev())
-				return {};
-
-			Node<T>* temp = first;
-
-			while (temp->next != currentNode) {
-				temp = temp->next;
-			}
-
-			T returnData = temp->data;
-			currentNode = temp;
-
-			return returnData;
-		}
-
-	};
-
-	bool Insert(LinkedListIterator pos, const T& element);
-	bool Erase(LinkedListIterator& pos);
-	LinkedListIterator GetIterator();
-	
-	// Assignment operator
-	LinkedList& operator=(LinkedList& other) {
-		if (this == &other) {
-			return *this; // Self-assignment check
-		}
-
-		// Clear the current list
-		Clear();
-
-		LinkedList<T, N>::LinkedListIterator otherIterator = other.GetIterator();
-		while (otherIterator.HasNext()) {
-			PushBack(otherIterator.Next());
-		}
-
-		return *this;
-	}
-
+	friend std::ostream& operator<<(std::ostream& os, const LinkedList<T, N>& list);
 
 };
 
@@ -226,21 +146,6 @@ bool LinkedList<T, N>::PopBack() {
 	return true;
 }
 
-template <class T, unsigned int N>
-void LinkedList<T, N>::PrintValues() {
-
-	if (first == NULL)
-		return;
-		//cout << "Linked list is empty" << endl;
-
-	Node<T>* temp = first;
-	//cout << "List is: " << endl;
-	while (temp != NULL) {
-		cout << temp->data << "->";
-		temp = temp->next;
-	}
-}
-
 template <class T, unsigned int N >
 T LinkedList<T, N>::Front() {
 
@@ -259,13 +164,13 @@ T LinkedList<T, N>::Back() {
 }
 
 template <class T, unsigned int N>
-typename LinkedList<T, N>::LinkedListIterator LinkedList<T, N>::GetIterator()
+LinkedListIterator<T, N> LinkedList<T, N>::GetIterator()
 {
-	return LinkedListIterator(first);
+	return LinkedListIterator<T, N>(first);
 }
 
 template <class T, unsigned int N>
-bool LinkedList<T, N>::Insert(LinkedListIterator pos, const T& element) {
+bool LinkedList<T, N>::Insert(LinkedListIterator<T, N> pos, const T& element) {
 
 	if (first == pos.currentNode) {
 		Node<T>* allocatedNode = nodePool.Allocate();
@@ -304,7 +209,7 @@ bool LinkedList<T, N>::Insert(LinkedListIterator pos, const T& element) {
 }
 
 template <class T, unsigned int N>
-bool LinkedList<T, N>::Erase(LinkedListIterator& pos) {
+bool LinkedList<T, N>::Erase(LinkedListIterator<T, N>& pos) {
 
 	if (pos.currentNode == NULL) {
 		//cout << "Can't delete the null node" << endl;
@@ -337,4 +242,40 @@ bool LinkedList<T, N>::Erase(LinkedListIterator& pos) {
 	//cout << "Erase is succesful3" << endl;
 	size--;
 	return true;
+}
+
+// Assignment operator
+template <class T, unsigned int N>
+LinkedList<T, N>& LinkedList<T, N>::operator=(LinkedList<T, N>& other) {
+	if (this == &other) {
+		return *this; // Self-assignment check
+	}
+
+	// Clear the current list
+	Clear();
+
+	LinkedListIterator<T, N> otherIterator = other.GetIterator();
+
+	while (otherIterator.HasNext()) {
+		PushBack(otherIterator.Next());
+	}
+
+	return *this;
+}
+
+template <class T, unsigned int N>
+std::ostream& operator<<(std::ostream& os, LinkedList<T, N>& list) {
+	
+	if (list.first == NULL)
+		return;
+	//cout << "Linked list is empty" << endl;
+
+	Node<T>* temp = list.first;
+	//cout << "List is: " << endl;
+	while (temp != NULL) {
+		std::cout << temp->data << "->";
+		temp = temp->next;
+	}
+
+	return os;
 }

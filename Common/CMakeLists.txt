@@ -5,7 +5,7 @@
 include_directories("include")
 
 # Add source to this project's executable.
-add_library (Common STATIC "src/StaticVectorLibrary.cpp" "src/LinkedListLibrary.cpp" "../MyProjectMain/GeneticAlgorithm.cpp")
+add_library (Common STATIC "src/StaticVectorLibrary.cpp" "src/LinkedListLibrary.cpp" "../MyProjectMain/GeneticAlgorithm.cpp" "include/LinkedListIterator.h" "include/StaticVectorIterator.h")
 
 set_target_properties(Common PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/libs)

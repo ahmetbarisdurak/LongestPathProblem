@@ -9,3 +9,4 @@ project (MyProject)
 # Include sub-projects.
 add_subdirectory ("MyProjectMain")
 add_subdirectory("Common")
+add_subdirectory("CommonUnitTests")
