@@ -48,13 +48,27 @@ public:
 	// Operator Overloading
 	StaticVector& operator=(const StaticVector& other);
 
-	friend std::ostream& operator<<(std::ostream& os, const StaticVector<T, N>& list);
+	template <class T, unsigned int N>
+	friend std::ostream& operator<<(std::ostream& os, StaticVector<T, N>& list);
 
 private:
 	const int capacity = N;
 	int size;
 	T staticVectorData[N];
 };
+
+
+template <class T, unsigned int N>
+std::ostream& operator<<(std::ostream& os, StaticVector<T, N>& list) {
+
+	for (int i = 0; i < list.GetSize(); i++)
+		os << list.staticVectorData[i] << " ";
+
+	os << std::endl;
+	return os;
+}
+
+
 
 template <class T, unsigned int N>
 StaticVector<T, N>::StaticVector() : size(0) {
@@ -166,14 +180,4 @@ StaticVector<T, N>& StaticVector<T, N>::operator=(const StaticVector& other) {
 		}
 	}
 	return *this;
-}
-
-template <class T, unsigned int N>
-std::ostream& operator<<(std::ostream& os, const StaticVector<T, N>& list) {
-	
-	for (int i = 0; i < list.GetSize(); i++)
-		std::cout << list.staticVectorData[i] << " ";
-
-	std::cout << std::endl;
-	return os;
 }

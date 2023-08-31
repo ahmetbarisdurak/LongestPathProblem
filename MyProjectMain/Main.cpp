@@ -1,7 +1,6 @@
 ﻿// MyProject.cpp : Defines the entry point for the application.
 //
 #include <iostream>
-#include <ostream>
 #include <LinkedListLibrary.h>
 #include <StaticVectorLibrary.h>
 #include <fstream>
@@ -15,7 +14,7 @@
 #define DISTANCE 200
 #define TOLERANCE 50
 #define CITY_COUNT 81 // 81
-#define START 5
+#define START 0
 
 // Reading CSV file and writing into StaticVectors
 void readCSVFile(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& cityDistances, StaticVector<std::string, CITY_COUNT>& cityNames) {
@@ -179,6 +178,259 @@ void findLongestPath(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& ad
 }
 */
 
+LinkedList<int, CITY_COUNT> DFSLongestPath(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, StaticVector<bool, CITY_COUNT>& visited, int currentVertex, int targetVertex, int& maxDepth) {
+	visited.SetIndex(currentVertex, true); // Set index as visited
+	LinkedList<int, CITY_COUNT> longestPath;
+
+	for (int neighbor = 0; neighbor < CITY_COUNT; ++neighbor) {
+		if (adjMatrix.GetIndex(currentVertex).GetIndex(neighbor) >= (DISTANCE - TOLERANCE) && adjMatrix.GetIndex(currentVertex).GetIndex(neighbor) <= (DISTANCE + TOLERANCE) && !visited.GetIndex(neighbor)) {
+
+			LinkedList<int, CITY_COUNT> neighborPath = dfs(adjMatrix, visited, neighbor);
+
+			if (neighborPath.GetSize() > maxDepth && neighborPath.Back() == targetVertex) { // finding the max componenet size and it's visiting order
+
+				longestPath.Clear();
+
+				LinkedListIterator<int, CITY_COUNT> llIterator = neighborPath.GetIterator();
+
+				while (llIterator.HasNext()) {
+					longestPath.PushBack(llIterator.Next());
+				}
+
+				maxDepth = neighborPath.GetSize();
+			}
+		}
+	}
+	longestPath.Insert(longestPath.GetIterator(), currentVertex); // Insertin the current vertex to start of the path
+
+	return longestPath;
+
+
+
+
+
+}
+
+/*
+int FindNumberOfCities(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, int index1, int index2) {
+	StaticVector<bool, CITY_COUNT> visited(false);
+	LinkedList<int, CITY_COUNT> visitOrder;
+	int maxDepth = 0;
+	visitOrder = DFSLongestPath(adjMatrix, visited, index1, index2, maxDepth);
+
+	std::cout << "Visit order size is " << visitOrder.GetSize() << std::endl;
+	std::cout << visitOrder;
+
+	return 0;
+
+}
+
+// Perform a 2-Opt swap to maximize the road length
+void Perform2OptSwap(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, StaticVector<int, CITY_COUNT>& path) {
+	for (int i = 1; i < path.GetSize() - 2; ++i) {
+		for (int j = i + 1; j < path.GetSize() - 1; ++j) {
+			//int oldEdgesSum = FindNumberOfCities(adjMatrix, i, i + 1) + FindNumberOfCities(adjMatrix, j, j + 1);
+
+			int oldEdgesSum = 2;
+			int newEdgesSum = FindNumberOfCities(adjMatrix, i, j) + FindNumberOfCities(adjMatrix, i + 1, j + 1);
+
+			if (newEdgesSum > oldEdgesSum) {
+				// Perform the 2-Opt swap
+				path.SetIndex(i + 1, path.GetIndex(j));
+				path.SetIndex(j, path.GetIndex(i + 1));
+			}
+		}
+	}
+}
+*/
+void NearestNeighborAlgorithm(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, int startingCity) {
+	
+	StaticVector<bool, CITY_COUNT> visited(false);
+	StaticVector<int, CITY_COUNT> path;
+
+	int currentCityIndex = startingCity;
+
+
+	path.PushBack(currentCityIndex);
+	visited.GetIndex(currentCityIndex) = true;
+
+
+	while (true) {
+		double minDistance = DISTANCE + TOLERANCE;
+		int nearestCityIndex = -1;
+
+		for (int i = 0; i < CITY_COUNT; ++i) {
+			if (!visited.GetIndex(i)) {
+				int distance = adjMatrix.GetIndex(currentCityIndex).GetIndex(i);
+				if (distance >= DISTANCE - TOLERANCE && distance <= DISTANCE + TOLERANCE && distance < minDistance) {
+					minDistance = distance;
+					nearestCityIndex = i;
+				}
+			}
+		}
+
+		if (nearestCityIndex == -1) {
+			break; // No neighbors
+		}
+
+		path.PushBack(nearestCityIndex);
+		visited.SetIndex(nearestCityIndex, true);
+		currentCityIndex = nearestCityIndex; // Continue to traverse from neighbor
+	}
+
+	std::cout << "Final path is: " << std::endl;
+	//std::cout << path;
+	std::cout << "\n Total of " << path.GetSize() << " cities are traversed" << std::endl;
+
+}
+
+//  method returns farthest node and its distance from node u
+int BFS(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, int u, StaticVector<bool, CITY_COUNT>& visited)
+{
+	//  mark all distance with -1
+	StaticVector<int, CITY_COUNT> distances(-1);
+	LinkedList<int, CITY_COUNT> queue;
+
+	queue.PushBack(u);
+
+	//  distance of u from u will be 0
+	distances.SetIndex(u, 0);
+
+	while (queue.GetSize() != 0)
+	{
+		int currentVertex = queue.Front();
+
+		queue.Erase(queue.GetIterator());
+		for (int neighbor = 0; neighbor < CITY_COUNT; ++neighbor) {
+			int distance = adjMatrix.GetIndex(currentVertex).GetIndex(neighbor);
+			if (distance > (DISTANCE - TOLERANCE) && distance < (DISTANCE + TOLERANCE)) {
+
+				if (distances.GetIndex(neighbor) == -1) {
+					queue.PushBack(neighbor);
+
+					distances.SetIndex(neighbor, distances.GetIndex(currentVertex) + 1);
+
+				}
+			}
+		}
+	}
+	int maxDistance = 0;
+	int nodeIdx = -1;
+
+	//  get farthest node distance and its index
+	for (int i = 0; i < CITY_COUNT; i++)
+	{
+		if (distances.GetIndex(i) > maxDistance && !visited.GetIndex(i)) {
+			maxDistance = distances.GetIndex(i);
+			nodeIdx = i;
+		}
+	}
+	
+	std::cout << "maxDistance from " << u << " to " << nodeIdx << " is " << maxDistance << std::endl;
+	
+	return nodeIdx;
+}
+
+void BFSSearchLongest(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>&adjMatrix) {
+	int t1, t2;
+
+	// first bfs to find one end point of
+	// longest path
+	//t1 = BFS(adjMatrix, 22);
+
+	//  second bfs to find actual longest path
+	//t2 = BFS(adjMatrix, t1);
+
+}
+
+int FindNeighborCount(int startingCity, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, StaticVector<bool, CITY_COUNT>& visited) {
+
+	int mostNeighbor = 0;
+	int mostNeighborIndex = -1;
+
+	for (int i = 0; i < CITY_COUNT; i++) {
+
+		int temp = 0;
+		if (adjMatrix.GetIndex(startingCity).GetIndex(i) <= DISTANCE + TOLERANCE && adjMatrix.GetIndex(startingCity).GetIndex(i) >= DISTANCE - TOLERANCE && !visited.GetIndex(i)) {
+			for (int j = 0; j < CITY_COUNT; j++) {
+				if (adjMatrix.GetIndex(i).GetIndex(j) <= DISTANCE + TOLERANCE && adjMatrix.GetIndex(i).GetIndex(j) >= DISTANCE - TOLERANCE)
+					temp++;
+
+			}
+		}
+
+		if (temp > mostNeighbor) {
+			mostNeighbor = temp;
+			mostNeighborIndex = i;
+		}
+
+	}
+
+
+	return mostNeighborIndex;
+
+}
+
+void MostNeighbourAlgorithm(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, int startingCity) {
+	StaticVector<bool, CITY_COUNT> visited(false);
+	StaticVector<int, CITY_COUNT> path;
+
+	int currentCityIndex = startingCity;
+
+
+	path.PushBack(currentCityIndex);
+	visited.GetIndex(currentCityIndex) = true;
+
+
+	while (true) {
+		
+		int mostNeighboredIndex = FindNeighborCount(currentCityIndex, adjMatrix, visited);
+		
+		if (mostNeighboredIndex == -1) {
+			break; // No neighbors
+		}
+
+
+		path.PushBack(mostNeighboredIndex);
+		visited.SetIndex(mostNeighboredIndex, true);
+
+	}
+
+	std::cout << "Final path is: " << std::endl;
+	//std::cout << path;
+	std::cout << "\n Total of " << path.GetSize() << " cities are traversed" << std::endl;
+}
+
+void AddLongestNeighbor(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, int startingCity) {
+
+	int currentCityIndex = startingCity;
+	StaticVector<bool, CITY_COUNT> visited(false);
+	StaticVector<int, CITY_COUNT> path;
+
+	path.PushBack(currentCityIndex);
+	visited.SetIndex(currentCityIndex, true);
+
+
+	while (true) {
+
+		int temp = BFS(adjMatrix, currentCityIndex, visited);
+
+		if (temp == -1)
+			break;
+
+		currentCityIndex = temp;
+		path.PushBack(temp);
+		visited.SetIndex(temp, true);
+
+	}
+
+
+	std::cout << "Final path is: " << std::endl;
+	//std::cout << path;
+	std::cout << "\n Total of " << path.GetSize() << " cities are traversed" << std::endl;
+
+}
+
 void RunTests() {
 
 	RunStaticVectorTests();
@@ -252,11 +504,22 @@ int main() {
 
 	readCSVFile(cityDistances, cityNames);
 
+	AddLongestNeighbor(adjMatrix, 0);
+
+	//for (int i = 0; i < CITY_COUNT; i++)
+	//MostNeighbourAlgorithm(cityDistances, i);
+
+	//for(int i = 0; i < CITY_COUNT; i++)
+		//NearestNeighborAlgorithm(cityDistances, i);
+
 
 	//GeneticAlgorithmUtil<int, CITY_COUNT>(cityDistances);
 	
+	//FindNumberOfCities(adjMatrix, 0, 5);
 
-	findMaxConnectedVertices(cityDistances);  // Output should be 3
+	//BFSSearchLongest(cityDistances);
+
+	//findMaxConnectedVertices(cityDistances);  // Output should be 3
 
 	/*
 	
