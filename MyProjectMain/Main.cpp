@@ -496,6 +496,8 @@ int main() {
 
 	FindMaximumPathCentrality(cityDistances, START, ClosenessCentralityScore);
 
+	StaticVector<bool, CITY_COUNT> visited;
+
 	//std::cout << "Adding the longest Neighbor" << std::endl;
 		//AddLongestNeighbor(adjMatrix, 5);
 
