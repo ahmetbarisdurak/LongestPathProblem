@@ -11,6 +11,7 @@ project(MyProjectMain)
 add_executable(MyProjectMain Main.cpp)
 
 # Include directories
+target_include_directories(MyProjectMain PRIVATE "${CMAKE_SOURCE_DIR}/MyProjectMain")
 target_include_directories(MyProjectMain PRIVATE "${CMAKE_SOURCE_DIR}/Common/include")
 target_include_directories(MyProjectMain PRIVATE "${CMAKE_SOURCE_DIR}/CommonUnitTests")
 

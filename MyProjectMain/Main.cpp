@@ -8,13 +8,12 @@
 #include <string>
 #include <LinkedListUnitTest.cpp>
 #include <StaticVectorUnitTest.cpp>
-//#include <GeneticAlgorithm.h>
+#include <HeuristicApproaches.cpp>
 
-
-#define DISTANCE 200
+#define DISTANCE 250
 #define TOLERANCE 50
-#define CITY_COUNT 7 // 81
-#define START 0
+#define CITY_COUNT 81 // 81
+#define START 5
 
 // Reading CSV file and writing into StaticVectors
 void readCSVFile(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& cityDistances, StaticVector<std::string, CITY_COUNT>& cityNames) {
@@ -60,6 +59,7 @@ void readCSVFile(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& cityDi
 
 
 }
+
 /*
 int dfs(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, StaticVector<bool, CITY_COUNT>& visited, int vertex, int pathLength, LinkedList<int, CITY_COUNT>& visitOrder) {
 	visited.SetIndex(vertex, true); // Set index as visited
@@ -254,8 +254,9 @@ void Perform2OptSwap(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& ad
 	}
 }
 */
+
 void NearestNeighborAlgorithm(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, int startingCity) {
-	
+
 	StaticVector<bool, CITY_COUNT> visited(false);
 	StaticVector<int, CITY_COUNT> path;
 
@@ -294,7 +295,6 @@ void NearestNeighborAlgorithm(StaticVector<StaticVector<int, CITY_COUNT>, CITY_C
 	std::cout << "\n Total of " << path.GetSize() << " cities are traversed" << std::endl;
 
 }
-
 //  method returns farthest node and its distance from node u
 int BFS(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, int u, StaticVector<bool, CITY_COUNT>& visited)
 {
@@ -380,37 +380,6 @@ int FindNeighborCount(int startingCity, StaticVector<StaticVector<int, CITY_COUN
 
 	return mostNeighborIndex;
 
-}
-
-void MostNeighbourAlgorithm(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, int startingCity) {
-	StaticVector<bool, CITY_COUNT> visited(false);
-	StaticVector<int, CITY_COUNT> path;
-
-	int currentCityIndex = startingCity;
-
-
-	path.PushBack(currentCityIndex);
-	visited.GetIndex(currentCityIndex) = true;
-
-
-	while (true) {
-		
-		int mostNeighboredIndex = FindNeighborCount(currentCityIndex, adjMatrix, visited);
-		
-		if (mostNeighboredIndex == -1) {
-			break; // No neighbors
-		}
-
-
-		path.PushBack(mostNeighboredIndex);
-		visited.SetIndex(mostNeighboredIndex, true);
-		currentCityIndex = mostNeighboredIndex;
-
-	}
-
-	std::cout << "Final path is: " << std::endl;
-	std::cout << path;
-	std::cout << "\n Total of " << path.GetSize() << " cities are traversed" << std::endl;
 }
 
 void AddLongestNeighbor(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, int startingCity) {
@@ -507,14 +476,22 @@ int main() {
 	adjMatrix.GetIndex(6).SetIndex(4, 0);
 	adjMatrix.GetIndex(6).SetIndex(5, 0);
 	adjMatrix.GetIndex(6).SetIndex(6, 0);
+	
 
+	
 	//RunTests();
 
 
-	//StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> cityDistances;
-	//StaticVector<std::string, CITY_COUNT> cityNames;
+	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> cityDistances;
+	StaticVector<std::string, CITY_COUNT> cityNames;
 
-	//readCSVFile(cityDistances, cityNames);
+	readCSVFile(cityDistances, cityNames);
+
+	//FindMaximumPath(adjMatrix, START);
+	FindMaximumPath(cityDistances, START, FirstOrderNeighborScore);
+
+
+	FindMaximumPath(cityDistances, START, SecondOrderNeighborScore);
 
 	//std::cout << "Adding the longest Neighbor" << std::endl;
 		//AddLongestNeighbor(adjMatrix, 5);
@@ -528,7 +505,7 @@ int main() {
 
 
 
-	std::cout << "Adding the nearest Neighbor" << std::endl;
+	//std::cout << "Adding the nearest Neighbor" << std::endl;
 
 	//for(int i = 0; i < CITY_COUNT; i++)
 		//NearestNeighborAlgorithm(cityDistances, i);
@@ -541,66 +518,8 @@ int main() {
 	//BFSSearchLongest(cityDistances);
 
 
-	std::cout << "Classic DFS algorithm" << std::endl;
-	findMaxConnectedVertices(adjMatrix);  // Output should be 3
-
-	/*
-	
-	int startCity = 0;  // Replace with the index of your starting city
-	int numCities = CITY_COUNT;
-
-	vector<bool> visitedCities(numCities, false);
-	int initialDistance = 0;
-	vector<int> initialPath;
-
-	int longestDistance = 0;
-	vector<int> longestPath;
-
-	findLongestPath(adjMatrix, startCity, visitedCities, initialDistance, initialPath, longestDistance, longestPath);
-	int i = 0;
-	cout << "Longest Path:";
-	for (int city : longestPath) {
-		cout << " " << city;
-		i++;
-	}
-	cout << endl;
-	cout << " i is " << i << endl;
-	cout << "Longest Distance: " << longestDistance << endl;
-	*/
-
+	//std::cout << "Classic DFS algorithm" << std::endl;
+	//findMaxConnectedVertices(adjMatrix);  // Output should be 3
 
 	return 0;
 }
-
-
-
-
-
-
-/*
-int main(int argc, char** argv)
-{
-	StaticVector<StaticVector<int, 81>, 81> cityDistances;
-	StaticVector<std::string, 81> cityNames;
-
-	readCSVFile(cityDistances, cityNames);
-
-	for (int i = 0; i < 81; i++) {
-		for (int j = 0; j < 81; j++) {
-			std::cout << cityDistances.GetIndex(i).GetIndex(j) << " ";
-		}
-		std::cout << std::endl;
-	}
-
-	for (int i = 0; i < 81; i++) {
-		std::cout << cityNames.GetIndex(i) << endl;
-	}
-
-	return 0;
-
-	
-	//::testing::InitGoogleTest(&argc, argv);
-	//return RUN_ALL_TESTS();
-	
-}
-*/
