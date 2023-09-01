@@ -487,7 +487,7 @@ int main() {
 	readCSVFile(cityDistances, cityNames);
 
 	//FindMaximumPath(adjMatrix, START);
-	 
+	
 	FindMaximumPath(cityDistances, START, FirstOrderNeighborScore);
 
 	FindMaximumPath(cityDistances, START, SecondOrderNeighborScore);
@@ -496,8 +496,15 @@ int main() {
 
 	FindMaximumPathCentrality(cityDistances, START, ClosenessCentralityScore);
 
-	StaticVector<bool, CITY_COUNT> visited;
+	FindMaximumPathTotalScore(START, cityDistances);
+	
 
+	//StaticVector<int, CITY_COUNT> currentPath;
+	//StaticVector<bool, CITY_COUNT> visited(false);
+
+
+	//findLongestPath(START, 2, currentPath, adjMatrix, visited);
+	
 	//std::cout << "Adding the longest Neighbor" << std::endl;
 		//AddLongestNeighbor(adjMatrix, 5);
 
