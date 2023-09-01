@@ -477,7 +477,6 @@ int main() {
 	adjMatrix.GetIndex(6).SetIndex(5, 0);
 	adjMatrix.GetIndex(6).SetIndex(6, 0);
 	
-
 	
 	//RunTests();
 
@@ -488,10 +487,14 @@ int main() {
 	readCSVFile(cityDistances, cityNames);
 
 	//FindMaximumPath(adjMatrix, START);
+	 
 	FindMaximumPath(cityDistances, START, FirstOrderNeighborScore);
 
-
 	FindMaximumPath(cityDistances, START, SecondOrderNeighborScore);
+
+	ClosenessCentrality(cityDistances);
+
+	FindMaximumPathCentrality(cityDistances, START, ClosenessCentralityScore);
 
 	//std::cout << "Adding the longest Neighbor" << std::endl;
 		//AddLongestNeighbor(adjMatrix, 5);

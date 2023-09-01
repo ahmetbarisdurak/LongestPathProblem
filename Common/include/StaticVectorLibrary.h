@@ -47,6 +47,7 @@ public:
 
 	// Operator Overloading
 	StaticVector& operator=(const StaticVector& other);
+	T& operator[](int index);
 
 	template <class T, unsigned int N>
 	friend std::ostream& operator<<(std::ostream& os, StaticVector<T, N>& list);
@@ -68,7 +69,10 @@ std::ostream& operator<<(std::ostream& os, StaticVector<T, N>& list) {
 	return os;
 }
 
-
+template <class T, unsigned int N>
+T& StaticVector<T, N>::operator[](int index) {
+	return staticVectorData[index];
+}
 
 template <class T, unsigned int N>
 StaticVector<T, N>::StaticVector() : size(0) {
