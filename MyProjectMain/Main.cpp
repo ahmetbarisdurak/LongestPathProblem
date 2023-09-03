@@ -17,7 +17,7 @@
 
 // Reading CSV file and writing into StaticVectors
 void readCSVFile(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& cityDistances, StaticVector<std::string, CITY_COUNT>& cityNames) {
-	std::ifstream file("ilmesafe.csv"); // Open the CSV file
+	std::ifstream file("C:\\Users\\ahmet\\Source\\Repos\\MyProject\\ilmesafe.csv"); // Open the CSV file
 
 	if (file.is_open()) {
 		std::string line;
@@ -412,6 +412,15 @@ void AddLongestNeighbor(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>&
 
 }
 
+void CreateGraph(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph) {
+	for (int i = 0; i < CITY_COUNT; ++i) {
+		for (int j = 0; j < CITY_COUNT; ++j) {
+			if (graph[i][j] > DISTANCE + TOLERANCE || graph[i][j] < DISTANCE - TOLERANCE)
+				graph[i][j] = 0;
+		}
+	}
+}
+
 void RunTests() {
 
 	RunStaticVectorTests();
@@ -488,15 +497,24 @@ int main() {
 
 	//FindMaximumPath(adjMatrix, START);
 	
-	FindMaximumPath(cityDistances, START, FirstOrderNeighborScore);
+	//FindMaximumPath(cityDistances, START, FirstOrderNeighborScore);
 
-	FindMaximumPath(cityDistances, START, SecondOrderNeighborScore);
+	//FindMaximumPath(cityDistances, START, SecondOrderNeighborScore);
 
-	ClosenessCentrality(cityDistances);
+	bool visited[CITY_COUNT];
 
-	FindMaximumPathCentrality(cityDistances, START, ClosenessCentralityScore);
+	for (int i = 0; i < CITY_COUNT; ++i) visited[i] = false;
+	
+	CreateGraph(cityDistances);
+	//ClosenessCentrality(cityDistances, visited);
 
-	FindMaximumPathTotalScore(START, cityDistances);
+	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph = cityDistances;
+
+	std::cout << "Maximum number of paths" << std::endl;
+	int value = FindMaximumPathCentrality1(graph, visited, START, -1, ClosenessCentrality());
+	std::cout << "Value is " << value << std::endl;
+
+	//FindMaximumPathTotalScore(START, cityDistances);
 	
 
 	//StaticVector<int, CITY_COUNT> currentPath;
