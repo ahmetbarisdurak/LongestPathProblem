@@ -7,6 +7,7 @@
 #define CITY_COUNT 81
 #define DISTANCE 250
 #define TOLERANCE 50
+#define START 5
 
 using ScoreFunction = int (*)(int, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>&, StaticVector<bool, CITY_COUNT>&);
 using DoubleScoreFunction = double (*)(int, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>&, StaticVector<bool, CITY_COUNT>&);
@@ -16,6 +17,11 @@ StaticVector<double, CITY_COUNT> closenessCentrality(0.0);
 class Algorithms {
 public:
 	virtual double Score(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited[CITY_COUNT]) = 0;
+};
+
+class DistanceToStart : public Algorithms {
+public:
+	double Score(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited[CITY_COUNT]);
 };
 
 class ClosenessCentrality : public Algorithms {
@@ -87,6 +93,12 @@ int BetweennessCentrality::ComputeBetweennessCentrality(int node, int start, int
 }
 
 
+double DistanceToStart::Score(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited_[CITY_COUNT]) {
+	
+	return graph[START][node];
+}
+
+
 
 // How many neighbors does the node have
 int FirstOrderNeighborScore(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph) {
@@ -111,7 +123,6 @@ int FirstOrderNeighborScore(int node, StaticVector<StaticVector<int, CITY_COUNT>
 
 	return tempScore;
 }
-
 
 int SecondOrderNeighborScore(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited[CITY_COUNT]) {
 
@@ -209,15 +220,16 @@ int Compare(int node1, int node2, StaticVector<StaticVector<int, CITY_COUNT>, CI
 
 	ClosenessCentrality cc;
 	BetweennessCentrality bc;
+	DistanceToStart dc;
 
 	bool visited[CITY_COUNT];
 
 	for (int i = 0; i < CITY_COUNT; ++i)
 		visited[i] = false;
 
-	double node1Score = 2 * FirstOrderNeighborScore(node1, graph) + 0.2 * SecondOrderNeighborScore(node1, graph, visited) + cc.Score(node1, graph, visited); // +bc.Score(node1, graph, visited);
+	double node1Score = FirstOrderNeighborScore(node1, graph) + SecondOrderNeighborScore(node1, graph, visited) + cc.Score(node1, graph, visited); // +bc.Score(node1, graph, visited);
 
-	double node2Score = 2 * FirstOrderNeighborScore(node2, graph) + 0.2 * SecondOrderNeighborScore(node2, graph, visited) + cc.Score(node2, graph, visited); // +bc.Score(node2, graph, visited);
+	double node2Score = FirstOrderNeighborScore(node2, graph) + SecondOrderNeighborScore(node2, graph, visited) + cc.Score(node2, graph, visited); // +bc.Score(node2, graph, visited);
 
 	if (node1Score > node2Score)
 		return 1;
@@ -253,15 +265,19 @@ bool findLongestPath(int currentNode, int endNode, StaticVector<int, CITY_COUNT>
 	currentPath.PushBack(currentNode);
 
 	if (currentNode == endNode) {
-		longestPath = currentPath;
-		return true;
-		
+		if (currentPath.GetSize() > longestPath.GetSize()) {
+			longestPath = currentPath;
+		}
+
+		//if (longestPath.GetSize() >= 63 || longestPath.GetSize() < 10 && longestPath.GetSize() > 1)
+			//return true;
 	}
 	else {
 		for (int neighbor = 0; neighbor < CITY_COUNT; ++neighbor) {
 			if (!visited[neighbor] && graph[currentNode][neighbor]) {
 				if (findLongestPath(neighbor, endNode, currentPath, graph, visited))
 					return true;
+					
 			}
 		}
 	}
@@ -297,23 +313,37 @@ void FindMaximumPathTotalScore(int startingCity, StaticVector<StaticVector<int, 
 	
 	for(int i = 0; i < CITY_COUNT; ++i) {
 		StaticVector<int, CITY_COUNT> currentPath;
+		longestPath = StaticVector<int, CITY_COUNT>();
 
 		std::cout << "Traversing through the list " << sortedCities[i] << std::endl;
+		
+
+		std::cout << longestPath;
 
 		if (visited[currentNode]) {
 			std::cout << "This node is already visited" << std::endl;
 			continue;
 		}
 
+		if (visited[sortedCities[i]])
+			continue;
+
+		std::cout << sortedCities[i] << " is not in the path " << std::endl;
+
 		visited[currentNode] = true;
 
 		if (!findLongestPath(currentNode, sortedCities[i], currentPath, graph, visited)) {
-			std::cout << "No path between" << std::endl;
+			std::cout << "No path between " << currentNode << "  " << sortedCities[i] << std::endl;
 			continue;
 		}
 		
-		std::cout << "Longest path is " << std::endl;
+
+		std::cout << "Therei s a path between " << currentNode << "  " << sortedCities[i] << std::endl;
+		std::cout << currentPath;
+
+		std::cout << "Longest path is ..... " << sortedCities[i] << std::endl;
 		std::cout << longestPath;
+
 
 		visited[longestPath[0]] = true;
 		for (int j = 0; j < longestPath.GetSize(); ++j) {
