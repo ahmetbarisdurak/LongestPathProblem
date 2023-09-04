@@ -17,7 +17,7 @@
 
 // Reading CSV file and writing into StaticVectors
 void readCSVFile(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& cityDistances, StaticVector<std::string, CITY_COUNT>& cityNames) {
-	std::ifstream file("C:\\Users\\ahmet\\Source\\Repos\\MyProject\\ilmesafe.csv"); // Open the CSV file
+	std::ifstream file("ilmesafe.csv"); // Open the CSV file
 
 	if (file.is_open()) {
 		std::string line;
@@ -510,13 +510,15 @@ int main() {
 
 	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph = cityDistances;
 
-	std::cout << "Maximum number of paths" << std::endl;
-	int value = FindMaximumPathCentrality1(graph, visited, START, -1, ClosenessCentrality());
-	std::cout << "Value is " << value << std::endl;
+	//std::cout << "Maximum number of paths" << std::endl;
+	//int value = FindMaximumPathCentrality1(graph, visited, START, -1, ClosenessCentrality());
+	//std::cout << "Value is " << value << std::endl;
 
-	//FindMaximumPathTotalScore(START, cityDistances);
+	FindMaximumPathTotalScore(START, graph);
 	
 
+
+	// -------------------------------------------------------------------------------------------- \\
 	//StaticVector<int, CITY_COUNT> currentPath;
 	//StaticVector<bool, CITY_COUNT> visited(false);
 

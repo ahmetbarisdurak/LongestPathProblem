@@ -13,9 +13,14 @@ using DoubleScoreFunction = double (*)(int, StaticVector<StaticVector<int, CITY_
 
 StaticVector<double, CITY_COUNT> closenessCentrality(0.0);
 
-class ClosenessCentrality {
+class Algorithms {
 public:
-	double ClosenessCentralityScore(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited[CITY_COUNT]);
+	virtual double Score(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited[CITY_COUNT]) = 0;
+};
+
+class ClosenessCentrality : public Algorithms {
+public:
+	double Score(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited[CITY_COUNT]);
 private:
 	int* ComputeClosenessCentrality(int start, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph);
 };
@@ -24,12 +29,11 @@ private:
 
 
 // How many neighbors does the node have
-int FirstOrderNeighborScore(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix) {
+int FirstOrderNeighborScore(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph) {
 	int tempScore = 0;
 
 	for (int i = 0; i < CITY_COUNT; ++i) {
-		int distance = adjMatrix[node][i];
-		if (distance <= DISTANCE + TOLERANCE && distance >= DISTANCE - TOLERANCE)
+		if (graph[node][i])
 			tempScore++;
 	}
 
@@ -37,12 +41,11 @@ int FirstOrderNeighborScore(int node, StaticVector<StaticVector<int, CITY_COUNT>
 }
 
 // Doesn't count the visited cities
-int FirstOrderNeighborScore(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, StaticVector<bool, CITY_COUNT>& visited) {
+int FirstOrderNeighborScore(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited[CITY_COUNT]) {
 	int tempScore = 0;
 
 	for (int i = 0; i < CITY_COUNT; ++i) {
-		int distance = adjMatrix[node][i];
-		if (distance <= DISTANCE + TOLERANCE && distance >= DISTANCE - TOLERANCE && !visited.GetIndex(i))
+		if (graph[node][i] && !visited[i])
 			tempScore++;
 	}
 
@@ -50,13 +53,12 @@ int FirstOrderNeighborScore(int node, StaticVector<StaticVector<int, CITY_COUNT>
 }
 
 
-int SecondOrderNeighborScore(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, StaticVector<bool, CITY_COUNT>& visited) {
+int SecondOrderNeighborScore(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited[CITY_COUNT]) {
 
 	int tempScore = 0;
 	for (int i = 0; i < CITY_COUNT; ++i) {
-		int distance = adjMatrix[node][i];
-		if (distance <= DISTANCE + TOLERANCE && distance >= DISTANCE - TOLERANCE && !visited.GetIndex(i)) {
-			tempScore += FirstOrderNeighborScore(i, adjMatrix, visited);
+		if (graph[node][i] && !visited[i]) {
+			tempScore += FirstOrderNeighborScore(i, graph, visited);
 		}
 	}
 
@@ -64,63 +66,26 @@ int SecondOrderNeighborScore(int node, StaticVector<StaticVector<int, CITY_COUNT
 
 }
 
-/*
-double ComputeClosenessCentrality(int sourceCity, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, StaticVector<bool, CITY_COUNT>& visited) {
-	//StaticVector<bool, CITY_COUNT> visited(false);
-	StaticVector<int, CITY_COUNT> distance(0);
-
-	visited[sourceCity] = true;
-	distance[sourceCity] = 0;
-
-	LinkedList<int, CITY_COUNT> queue;
-	queue.PushBack(sourceCity);
-
-	while (queue.GetSize() != 0) {
-		int currentCity = queue.Front();
-		queue.Erase(queue.GetIterator());
-
-		if (!visited[currentCity]) {
-			for (int neighborCity = 0; neighborCity < CITY_COUNT; ++neighborCity) {
-				int cityDistance = adjMatrix[currentCity][neighborCity];
-				if (cityDistance <= DISTANCE + TOLERANCE && cityDistance >= DISTANCE - TOLERANCE && !visited[neighborCity]) {
-					distance[neighborCity] = distance[currentCity] + 1;
-					queue.PushBack(neighborCity);
-				}
-			}
-			visited[currentCity] = true;
-		}
-	}
-
-	// Calculate closeness centrality score for the source city
-	double closeness = 0.0;
-	for (int i = 0; i < CITY_COUNT; ++i) {
-		closeness += distance[i]; // sum up distances
-		
-	}
-
-	return 1.0 / closeness;
-}
-
-void ClosenessCentrality(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, StaticVector<bool, CITY_COUNT>& visited) {
-	for (int sourceCity = 0; sourceCity < CITY_COUNT; ++sourceCity) {
-		//closenessCentrality[sourceCity] = ComputeClosenessCentrality(sourceCity, adjMatrix, visited);
-	}
-}
-*/
-double ClosenessCentrality::ClosenessCentralityScore(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, bool visited[CITY_COUNT]) {
-	int* dists = ComputeClosenessCentrality(node, adjMatrix); int sum = 0;
-	for (int i = 0; i < CITY_COUNT; ++i) sum += dists[i];
+double ClosenessCentrality::Score(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, bool visited[CITY_COUNT]) {
+	int* distances = ComputeClosenessCentrality(node, adjMatrix); 
+	int sum = 0;
+	for (int i = 0; i < CITY_COUNT; ++i) 
+		sum += distances[i];
 
 	return 1.0 / sum;
 }
-/*
-int* ClosenessCentrality::ComputeClosenessCentrality(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix) {
+
+int* ClosenessCentrality::ComputeClosenessCentrality(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph) {
 	LinkedList<int, CITY_COUNT> queue;
 	queue.PushBack(node);
-	bool visited[CITY_COUNT];
-	static int dists[CITY_COUNT];
 
-	for (int i = 0; i < CITY_COUNT; ++i) { visited[i] = false; dists[i] = 0; };
+	bool visited[CITY_COUNT];
+	int distances[CITY_COUNT];
+
+	for (int i = 0; i < CITY_COUNT; ++i) { 
+		visited[i] = false; 
+		distances[i] = 0;
+	}
 
 	while (queue.GetSize() != 0) {
 		int currentCity = queue.Front();
@@ -128,11 +93,10 @@ int* ClosenessCentrality::ComputeClosenessCentrality(int node, StaticVector<Stat
 		queue.Erase(queue.GetIterator());
 
 
-		
 		if (!visited[currentCity]) {
 			for (int neighborCity = 0; neighborCity < CITY_COUNT; ++neighborCity) {
-				if (adjMatrix[currentCity][neighborCity] && !visited[neighborCity]) {
-					dists[neighborCity] = dists[currentCity] + 1;
+				if (graph[currentCity][neighborCity] && !visited[neighborCity]) {
+					distances[neighborCity] = distances[currentCity] + 1;
 					queue.PushBack(neighborCity);
 				}
 			}
@@ -140,35 +104,8 @@ int* ClosenessCentrality::ComputeClosenessCentrality(int node, StaticVector<Stat
 		}
 	}
 
-	return dists;
+	return distances;
 }
-*/
-int* ClosenessCentrality::ComputeClosenessCentrality(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix) {
-	std::queue<int> queue;
-	queue.push(node);
-	bool visited[CITY_COUNT];
-	static int dists[CITY_COUNT];
-
-	for (int i = 0; i < CITY_COUNT; ++i) { visited[i] = false; dists[i] = 0; };
-
-	while (!queue.empty()) {
-		int currentCity = queue.front();
-		queue.pop();
-
-		if (!visited[currentCity]) {
-			for (int neighborCity = 0; neighborCity < CITY_COUNT; ++neighborCity) {
-				if (adjMatrix[currentCity][neighborCity] && !visited[neighborCity]) {
-					dists[neighborCity] = dists[currentCity] + 1;
-					queue.push(neighborCity);
-				}
-			}
-			visited[currentCity] = true;
-		}
-	}
-
-	return dists;
-}
-
 
 void FindMaximumPath(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, int startingCity, ScoreFunction scoringFunction) {
 	StaticVector<bool, CITY_COUNT> visited(false);
@@ -208,17 +145,17 @@ void FindMaximumPath(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& ad
 	std::cout << maxPath;
 }
 
-int CalculateTotalScore(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix) {
+int Compare(int node1, int node2, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph) {
 
+	ClosenessCentrality cc;
+	bool visited[CITY_COUNT];
 
-	return 1 * FirstOrderNeighborScore(node, adjMatrix); //+ 0 * //ClosenessCentralityScore(node, adjMatrix);
-}
+	for (int i = 0; i < CITY_COUNT; ++i)
+		visited[i] = false;
 
-int Compare(int node1, int node2, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix) {
+	double node1Score = FirstOrderNeighborScore(node1, graph) + 2 * SecondOrderNeighborScore(node1, graph, visited) + 1.5 * cc.Score(node1, graph, visited);
 
-	int node1Score = FirstOrderNeighborScore(node1, adjMatrix);// +ClosenessCentralityScore(node1, adjMatrix);
-
-	int node2Score = FirstOrderNeighborScore(node2, adjMatrix);// +ClosenessCentralityScore(node2, adjMatrix);
+	double node2Score = FirstOrderNeighborScore(node2, graph) + 2 * SecondOrderNeighborScore(node2, graph, visited) + 1.5 * cc.Score(node2, graph, visited);
 
 	if (node1Score > node2Score)
 		return 1;
@@ -227,7 +164,8 @@ int Compare(int node1, int node2, StaticVector<StaticVector<int, CITY_COUNT>, CI
 
 }
 
-void CalculateTotalScoreAndSort(StaticVector<int, CITY_COUNT>& sortedCities, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix) {
+// Sorting the cities according to their scores
+void CalculateTotalScoreAndSort(StaticVector<int, CITY_COUNT>& sortedCities, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph) {
 
 	int i, j;
 	int key;
@@ -235,7 +173,7 @@ void CalculateTotalScoreAndSort(StaticVector<int, CITY_COUNT>& sortedCities, Sta
 		key = sortedCities[i];
 		j = i - 1;
 
-		while (j >= 0 && Compare(key, sortedCities[j], adjMatrix)) {
+		while (j >= 0 && Compare(key, sortedCities[j], graph)) {
 			sortedCities[j + 1] = sortedCities[j];
 			j = j - 1;
 		}
@@ -246,54 +184,131 @@ void CalculateTotalScoreAndSort(StaticVector<int, CITY_COUNT>& sortedCities, Sta
 
 StaticVector<int, CITY_COUNT> longestPath;
 
-void findLongestPath(int currentNode, int endNode, StaticVector<int, CITY_COUNT>& currentPath, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix,
-	StaticVector<bool, CITY_COUNT>& visited) {
+bool findLongestPath(int currentNode, int endNode, StaticVector<int, CITY_COUNT>& currentPath, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph,
+	bool visited[CITY_COUNT]) {
 	
 	visited[currentNode] = true;
 	currentPath.PushBack(currentNode);
 
 	if (currentNode == endNode) {
-		if (currentPath.GetSize() > longestPath.GetSize()) {
-			longestPath = currentPath;
-		}
+		longestPath = currentPath;
+		return true;
+		
 	}
 	else {
 		for (int neighbor = 0; neighbor < CITY_COUNT; ++neighbor) {
-			if (adjMatrix[currentNode][neighbor] >= DISTANCE - TOLERANCE && adjMatrix[currentNode][neighbor] <= DISTANCE + TOLERANCE && !visited[neighbor]) {
-				findLongestPath(neighbor, endNode, currentPath, adjMatrix, visited);
+			if (!visited[neighbor] && graph[currentNode][neighbor]) {
+				if (findLongestPath(neighbor, endNode, currentPath, graph, visited))
+					return true;
 			}
 		}
 	}
 
 	visited[currentNode] = false;
 	currentPath.PopBack();
+	return false;
 }
 
 
-void FindMaximumPathTotalScore(int startingCity, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix) {
-	StaticVector<bool, CITY_COUNT> visited(false);
+
+void FindMaximumPathTotalScore(int startingCity, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph) {
+	bool visited[CITY_COUNT];
 	StaticVector<int, CITY_COUNT> sortedCities;
 
-	for (int i = 0; i < CITY_COUNT; ++i)
+	for (int i = 0; i < CITY_COUNT; ++i) {
 		sortedCities.PushBack(i);
+		visited[i] = false;
+	}
 
-	CalculateTotalScoreAndSort(sortedCities, adjMatrix);
+	CalculateTotalScoreAndSort(sortedCities, graph);
+	
+	StaticVector<int, CITY_COUNT> foundPath;
+	int currentNode = startingCity;
+
+	// Traversing in sorted cities list for one time
+	for (int i = 0; i < CITY_COUNT; ++i) {
+		StaticVector<int, CITY_COUNT> currentPath;
+
+		std::cout << "Traversing through the list " << sortedCities[i] << std::endl;
+
+		if (visited[currentNode]) {
+			std::cout << "This node is already visited" << std::endl;
+			continue;
+		}
+
+		visited[currentNode] = true;
+
+		if (!findLongestPath(currentNode, sortedCities[i], currentPath, graph, visited)) {
+			std::cout << "No path between" << std::endl;
+			continue;
+		}
+		
+		std::cout << "Longest path is " << std::endl;
+		std::cout << longestPath;
+
+
+		visited[longestPath[0]] = true;
+		for (int j = 0; j < longestPath.GetSize(); ++j) {
+			foundPath.PushBack(longestPath[j]);
+			visited[longestPath[j]] = true;
+		}
+
+		foundPath.PopBack();
+		currentNode = sortedCities[i];
+		visited[currentNode] = false;
+
+		std::cout << "FOUND PATH IS: " << std::endl;
+		std::cout << foundPath;
+		
+
+	}
+
+	foundPath.PushBack(currentNode);
+
+	std::cout << "Number of cities is " << foundPath.GetSize() << std::endl;
+	std::cout << " Printing the path " << std::endl;
+	std::cout << foundPath;
+
+
+	// Start from the starting city and traverse through the vector and add them to your path.
+
+
+
+
+}
+
+/*
+void FindMaximumPathTotalScore(int startingCity, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph) {
+	bool visited[CITY_COUNT];
+	StaticVector<int, CITY_COUNT> sortedCities;
+
+	for (int i = 0; i < CITY_COUNT; ++i) {
+		sortedCities.PushBack(i);
+		visited[i] = false;
+	}
+
+	CalculateTotalScoreAndSort(sortedCities, graph);
+
+	std::cout << sortedCities;
+
 
 	StaticVector<int, CITY_COUNT> foundPath;
 	int currentNode = startingCity;
 	visited[startingCity] = true;
 	foundPath.PushBack(startingCity);
 
+	// Traversing in sorted cities list for one time
 	for (int i = 0; i < CITY_COUNT; ++i) {
+		std::cout << "Traversing through the list " << i << std::endl;
+		std::cout << "Adding current node: " << currentNode << std::endl;
 		longestPath = StaticVector<int, CITY_COUNT>();
 		StaticVector<int, CITY_COUNT> currentPath;
-		
-		findLongestPath(currentNode, sortedCities[i], currentPath, adjMatrix, visited);
-		
-		if (longestPath.GetSize() == 0)
+
+		if (!findLongestPath(currentNode, sortedCities[i], currentPath, graph, visited))
 			continue;
 
-		visited = StaticVector<bool, CITY_COUNT>(false);
+		for(int i = 0; i < CITY_COUNT; i++)
+			visited[i] = false;
 
 		for (int j = 1; j < longestPath.GetSize(); ++j) {
 			foundPath.PushBack(longestPath[j]);
@@ -314,8 +329,7 @@ void FindMaximumPathTotalScore(int startingCity, StaticVector<StaticVector<int, 
 
 
 
-}
-
+}*/
 void FindMaximumPathCentrality(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, int startingCity, DoubleScoreFunction scoringFunction) {
 	StaticVector<bool, CITY_COUNT> visited(false);
 	StaticVector<int, CITY_COUNT> maxPath;
@@ -368,7 +382,7 @@ int FindMaximumPathCentrality1(StaticVector<StaticVector<int, CITY_COUNT>, CITY_
 
 	for (int i = 0; i < CITY_COUNT; ++i) {
 		if (adjMatrix[startingCity][i]) {
-			double cur = cc.ClosenessCentralityScore(i, adjMatrix, visited);
+			double cur = cc.Score(i, adjMatrix, visited);
 			std::cout << "CURRENT IS " << i + 1 << " AND SCORE IS " << cur << std::endl;
 			if (cur > highestScore) { highestScore = cur; highestScoreIndex = i; }
 		}
