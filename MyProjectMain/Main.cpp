@@ -437,25 +437,33 @@ int main() {
 
 	readCSVFile(cityDistances, cityNames);
 
-	//FindMaximumPath(adjMatrix, START);
-	
-	//FindMaximumPath(cityDistances, START, FirstOrderNeighborScore);
+	CreateGraph(cityDistances);
 
-	//FindMaximumPath(cityDistances, START, SecondOrderNeighborScore);
+	FirstOrderNeighbors fon;
+	SecondOrderNeighbors son;
+	ClosenessCentrality cc;
+	BetweennessCentrality bc;
+
+	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph = cityDistances;
+	FindMaximumPath(graph, START, fon);
+
+	graph = cityDistances;
+	FindMaximumPath(graph, START, son);
+
+	graph = cityDistances;
+	FindMaximumPath(graph, START, cc);
+
+	graph = cityDistances;
+	FindMaximumPath(graph, START, bc);
 
 	bool visited[CITY_COUNT];
 
 	for (int i = 0; i < CITY_COUNT; ++i) visited[i] = false;
-	
-	CreateGraph(cityDistances);
-	//ClosenessCentrality(cityDistances, visited);
 
-	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph = cityDistances;
+	graph = cityDistances;
+	std::cout << FindMaximumPathCentrality(graph, visited, START, -1, cc) << std::endl;
 
-	//std::cout << "Maximum number of paths" << std::endl;
-	//int value = FindMaximumPathCentrality1(graph, visited, START, -1, ClosenessCentrality());
-	//std::cout << "Value is " << value << std::endl;
-
+	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph1 = cityDistances;
 	FindMaximumPathTotalScore(START, graph);
 
 
