@@ -164,31 +164,6 @@ void findMaxConnectedVertices(StaticVector<StaticVector<int, CITY_COUNT>, CITY_C
 	*/
 }
 
-/*
-* Used For Test Purposes 
-* 
-* 
-void findLongestPath(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, int startCity, std::vector<bool>& visitedCities, int currentDistance, std::vector<int>& currentPath, int& maxDistance, std::vector<int>& maxPath) {
-	visitedCities[startCity] = true;
-	currentPath.push_back(startCity);
-
-	if (currentDistance > maxDistance) {
-		maxDistance = currentDistance;
-		maxPath = currentPath;
-	}
-
-	for (int city = 0; city < CITY_COUNT; ++city) {
-		if (!visitedCities[city] && adjMatrix.GetIndex(startCity).GetIndex(city) >= DISTANCE - TOLERANCE && adjMatrix.GetIndex(startCity).GetIndex(city) <= DISTANCE + TOLERANCE) {
-			int newDistance = currentDistance + 1;
-			vector<int> newPath = currentPath;
-
-			findLongestPath(adjMatrix, city, visitedCities, newDistance, newPath, maxDistance, maxPath);
-		}
-	}
-
-}
-*/
-
 LinkedList<int, CITY_COUNT> DFSLongestPath(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, StaticVector<bool, CITY_COUNT>& visited, int currentVertex, int targetVertex, int& maxDepth) {
 	visited.SetIndex(currentVertex, true); // Set index as visited
 	LinkedList<int, CITY_COUNT> longestPath;
@@ -221,39 +196,6 @@ LinkedList<int, CITY_COUNT> DFSLongestPath(StaticVector<StaticVector<int, CITY_C
 
 
 }
-
-/*
-int FindNumberOfCities(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, int index1, int index2) {
-	StaticVector<bool, CITY_COUNT> visited(false);
-	LinkedList<int, CITY_COUNT> visitOrder;
-	int maxDepth = 0;
-	visitOrder = DFSLongestPath(adjMatrix, visited, index1, index2, maxDepth);
-
-	std::cout << "Visit order size is " << visitOrder.GetSize() << std::endl;
-	std::cout << visitOrder;
-
-	return 0;
-
-}
-
-// Perform a 2-Opt swap to maximize the road length
-void Perform2OptSwap(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, StaticVector<int, CITY_COUNT>& path) {
-	for (int i = 1; i < path.GetSize() - 2; ++i) {
-		for (int j = i + 1; j < path.GetSize() - 1; ++j) {
-			//int oldEdgesSum = FindNumberOfCities(adjMatrix, i, i + 1) + FindNumberOfCities(adjMatrix, j, j + 1);
-
-			int oldEdgesSum = 2;
-			int newEdgesSum = FindNumberOfCities(adjMatrix, i, j) + FindNumberOfCities(adjMatrix, i + 1, j + 1);
-
-			if (newEdgesSum > oldEdgesSum) {
-				// Perform the 2-Opt swap
-				path.SetIndex(i + 1, path.GetIndex(j));
-				path.SetIndex(j, path.GetIndex(i + 1));
-			}
-		}
-	}
-}
-*/
 
 void NearestNeighborAlgorithm(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, int startingCity) {
 
