@@ -464,7 +464,7 @@ int main() {
 	std::cout << FindMaximumPathCentrality(graph, visited, START, -1, cc) << std::endl;
 
 	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph1 = cityDistances;
-	FindMaximumPathTotalScore(START, graph);
+	FindMaximumPathTotalScore(START, graph1);
 
 
 
