@@ -10,6 +10,8 @@
 #include <StaticVectorUnitTest.cpp>
 #include <HeuristicApproaches.cpp>
 
+#include <unordered_set>
+
 #define DISTANCE 250
 #define TOLERANCE 50
 #define CITY_COUNT 81 // 81
@@ -369,9 +371,20 @@ void RunTests() {
 	RunLinkedListTests();
 }
 
+int FindEdgeCount(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph) {
+	int edges = 0;
+	for (int i = 0; i < CITY_COUNT; ++i) {
+		for (int j = 0; j < CITY_COUNT; ++j) {
+			if (graph[i][j]) 
+				edges++;
+		}
+	}
+	return edges;
+}
+
 int main() {
 	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> adjMatrix;
-	
+
 	adjMatrix.GetIndex(0).SetIndex(0, 0);
 	adjMatrix.GetIndex(0).SetIndex(1, 200);
 	adjMatrix.GetIndex(0).SetIndex(2, 0);
@@ -379,6 +392,7 @@ int main() {
 	adjMatrix.GetIndex(0).SetIndex(4, 200);
 	adjMatrix.GetIndex(0).SetIndex(5, 0);
 	adjMatrix.GetIndex(0).SetIndex(6, 0);
+	adjMatrix.GetIndex(0).SetIndex(7, 0);
 
 	adjMatrix.GetIndex(1).SetIndex(0, 200);
 	adjMatrix.GetIndex(1).SetIndex(1, 0);
@@ -387,6 +401,7 @@ int main() {
 	adjMatrix.GetIndex(1).SetIndex(4, 0);
 	adjMatrix.GetIndex(1).SetIndex(5, 200);
 	adjMatrix.GetIndex(1).SetIndex(6, 0);
+	adjMatrix.GetIndex(1).SetIndex(7, 0);
 
 	adjMatrix.GetIndex(2).SetIndex(0, 0);
 	adjMatrix.GetIndex(2).SetIndex(1, 200);
@@ -395,6 +410,7 @@ int main() {
 	adjMatrix.GetIndex(2).SetIndex(4, 0);
 	adjMatrix.GetIndex(2).SetIndex(5, 0);
 	adjMatrix.GetIndex(2).SetIndex(6, 0);
+	adjMatrix.GetIndex(2).SetIndex(7, 0);
 
 	adjMatrix.GetIndex(3).SetIndex(0, 200);
 	adjMatrix.GetIndex(3).SetIndex(1, 0);
@@ -403,6 +419,7 @@ int main() {
 	adjMatrix.GetIndex(3).SetIndex(4, 0);
 	adjMatrix.GetIndex(3).SetIndex(5, 0);
 	adjMatrix.GetIndex(3).SetIndex(6, 200);
+	adjMatrix.GetIndex(3).SetIndex(7, 0);
 
 	adjMatrix.GetIndex(4).SetIndex(0, 200);
 	adjMatrix.GetIndex(4).SetIndex(1, 0);
@@ -411,6 +428,7 @@ int main() {
 	adjMatrix.GetIndex(4).SetIndex(4, 0);
 	adjMatrix.GetIndex(4).SetIndex(5, 200);
 	adjMatrix.GetIndex(4).SetIndex(6, 0);
+	adjMatrix.GetIndex(4).SetIndex(7, 0);
 
 	adjMatrix.GetIndex(5).SetIndex(0, 0);
 	adjMatrix.GetIndex(5).SetIndex(1, 200);
@@ -419,7 +437,8 @@ int main() {
 	adjMatrix.GetIndex(5).SetIndex(4, 200);
 	adjMatrix.GetIndex(5).SetIndex(5, 0);
 	adjMatrix.GetIndex(5).SetIndex(6, 0);
-   
+	adjMatrix.GetIndex(5).SetIndex(7, 0);
+
 	adjMatrix.GetIndex(6).SetIndex(0, 0);
 	adjMatrix.GetIndex(6).SetIndex(1, 0);
 	adjMatrix.GetIndex(6).SetIndex(2, 0);
@@ -427,34 +446,61 @@ int main() {
 	adjMatrix.GetIndex(6).SetIndex(4, 0);
 	adjMatrix.GetIndex(6).SetIndex(5, 0);
 	adjMatrix.GetIndex(6).SetIndex(6, 0);
-	
-	
+	adjMatrix.GetIndex(6).SetIndex(7, 0);
+
+
+	adjMatrix.GetIndex(7).SetIndex(0, 0);
+	adjMatrix.GetIndex(7).SetIndex(1, 0);
+	adjMatrix.GetIndex(7).SetIndex(2, 0);
+	adjMatrix.GetIndex(7).SetIndex(3, 0);
+	adjMatrix.GetIndex(7).SetIndex(4, 0);
+	adjMatrix.GetIndex(7).SetIndex(5, 0);
+	adjMatrix.GetIndex(7).SetIndex(6, 0);
+	adjMatrix.GetIndex(7).SetIndex(7, 0);
+
+
 	//RunTests();
 
-
+	
 	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> cityDistances;
 	StaticVector<std::string, CITY_COUNT> cityNames;
 
 	readCSVFile(cityDistances, cityNames);
 
 	CreateGraph(cityDistances);
-
+	
 	FirstOrderNeighbors fon;
 	SecondOrderNeighbors son;
+	ThirdOrderNeighbors ton;
 	ClosenessCentrality cc;
 	BetweennessCentrality bc;
+	Algorithms* algorithms[4];
+
+	algorithms[0] = &fon;
+	algorithms[1] = &son;
+	algorithms[2] = &cc;
+	algorithms[3] = &ton;
+
 
 	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph = cityDistances;
+	std::cout << "First Order Neighbor Score " << std::endl;
 	FindMaximumPath(graph, START, fon);
 
 	graph = cityDistances;
+	std::cout << "Second Order Neighbor Score " << std::endl;
 	FindMaximumPath(graph, START, son);
 
 	graph = cityDistances;
+	std::cout << "Third Order Neighbor Score " << std::endl;
+	FindMaximumPath(graph, START, ton);
+
+	graph = cityDistances;
+	std::cout << "Closeness Centrality Score " << std::endl;
 	FindMaximumPath(graph, START, cc);
 
 	graph = cityDistances;
-	FindMaximumPath(graph, START, bc);
+	std::cout << "Betweenness Centrality Score " << std::endl;
+	//FindMaximumPath(graph, START, bc);
 
 	bool visited[CITY_COUNT];
 
@@ -462,12 +508,38 @@ int main() {
 
 	graph = cityDistances;
 	std::cout << FindMaximumPathCentrality(graph, visited, START, -1, cc) << std::endl;
+	std::cout << FindEdgeCount(graph) << std::endl;
+
+	
+	std::cout << "Combination" << std::endl;
 
 	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph1 = cityDistances;
-	FindMaximumPathTotalScore(START, graph1);
+	for (int i = 0; i < CITY_COUNT; ++i) visited[i] = false;
+	std::cout << FindMaximumPathCombination(graph1, visited, START, -1, algorithms) << std::endl;
 
 
 
+	for (int i = 0; i < CITY_COUNT; ++i) visited[i] = false;
+
+	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph2 = cityDistances;
+	FindMaximumPathTotalScore(START, graph2);
+	
+
+	/*
+
+	std::cout << FindEdgeCount(adjMatrix) << std::endl;
+
+	bool visited[CITY_COUNT];
+	StaticVector<int, CITY_COUNT> currentPath;
+
+	for (int i = 0; i < CITY_COUNT; ++i) visited[i] = false;
+
+	findLongestPath(START, 7, currentPath, adjMatrix, visited);
+
+	std::cout << currentPath;
+	std::cout << longestPath;
+	
+	*/
 	// -------------------------------------------------------------------------------------------- \\
 	//StaticVector<int, CITY_COUNT> currentPath;
 	//StaticVector<bool, CITY_COUNT> visited(false);

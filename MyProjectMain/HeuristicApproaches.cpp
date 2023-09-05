@@ -4,6 +4,7 @@
 #include <LinkedListLibrary.h>
 #include <StaticVectorLibrary.h>
 #include <queue>
+#include <unordered_set>
 #define CITY_COUNT 81
 #define DISTANCE 250
 #define TOLERANCE 50
@@ -50,6 +51,66 @@ public:
 private:
 	int FirstOrderNeighborScore(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph);
 };
+
+class ThirdOrderNeighbors : public Algorithms {
+public:
+	double Score(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited[CITY_COUNT]);
+private:
+	int FirstOrderNeighborScore(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited[CITY_COUNT]);
+	int SecondOrderNeighborScore(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited[CITY_COUNT]);
+};
+
+int ThirdOrderNeighbors::FirstOrderNeighborScore(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited[CITY_COUNT]) {
+	int neighbours = 0;
+	for (int i = 0; i < CITY_COUNT; ++i) {
+		if (i != node && graph[node][i] && visited[i]) neighbours++;
+	}
+
+	return neighbours;
+}
+
+int ThirdOrderNeighbors::SecondOrderNeighborScore(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited[CITY_COUNT]) {
+	bool old = visited[node];
+	visited[node] = true;
+
+	int max = 0, maxi = -1;
+	for (int i = 0; i < CITY_COUNT; ++i) {
+		if (graph[node][i]) {
+			int cur = FirstOrderNeighborScore(i, graph, visited);
+			if (cur > max) {
+				max = cur;
+				maxi = i;
+			}
+		}
+	}
+
+	visited[node] = old;
+	return max;
+}
+
+double ThirdOrderNeighbors::Score(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited[CITY_COUNT]) {
+	bool old = visited[node];
+	visited[node] = true;
+
+	int max = 0, maxi = -1;
+	for (int i = 0; i < CITY_COUNT; ++i) {
+		if (graph[node][i] && !visited[i]) {
+			int cur = SecondOrderNeighborScore(i, graph, visited);
+			if (cur > max) {
+				max = cur;
+				maxi = i;
+			}
+		}
+	}
+	visited[node] = old;
+
+	return 1.0 - 1.0 / max;
+}
+
+
+
+
+
 double BetweennessCentrality::Score(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited[CITY_COUNT]) {
 	int total = 0, containing = 0;
 	for (int i = 0; i < CITY_COUNT; ++i) {
@@ -251,6 +312,8 @@ int Compare(int node1, int node2, StaticVector<StaticVector<int, CITY_COUNT>, CI
 
 }
 
+StaticVector<int, CITY_COUNT> cityTimes(0);
+
 // Sorting the cities according to their scores
 void CalculateTotalScoreAndSort(StaticVector<int, CITY_COUNT>& sortedCities, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph) {
 
@@ -275,30 +338,38 @@ bool findLongestPath(int currentNode, int endNode, StaticVector<int, CITY_COUNT>
 	
 	visited[currentNode] = true;
 	currentPath.PushBack(currentNode);
+	cityTimes[currentNode]++;
+
+	if (cityTimes[currentNode] > 10000000) {
+		visited[currentNode] = false;
+		currentPath.PopBack();
+		return true;
+	}
 
 	if (currentNode == endNode) {
 		if (currentPath.GetSize() > longestPath.GetSize()) {
 			longestPath = currentPath;
+			std::cout << "Longest path is " << std::endl << longestPath;
 		}
 
 		//if (longestPath.GetSize() >= 63 || longestPath.GetSize() < 10 && longestPath.GetSize() > 1)
 			//return true;
 	}
+
+
 	else {
 		for (int neighbor = 0; neighbor < CITY_COUNT; ++neighbor) {
-			if (!visited[neighbor] && graph[currentNode][neighbor]) {
+			
+			if (!visited[neighbor] && graph[currentNode][neighbor] && cityTimes[neighbor] <= 10000000) {
 				if (findLongestPath(neighbor, endNode, currentPath, graph, visited))
 					return true;
-					
 			}
 		}
 	}
-
 	visited[currentNode] = false;
 	currentPath.PopBack();
 	return false;
 }
-
 
 
 void FindMaximumPathTotalScore(int startingCity, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph) {
@@ -350,7 +421,7 @@ void FindMaximumPathTotalScore(int startingCity, StaticVector<StaticVector<int, 
 		}
 		
 
-		std::cout << "Therei s a path between " << currentNode << "  " << sortedCities[i] << std::endl;
+		std::cout << "There is a path between " << currentNode << "  " << sortedCities[i] << std::endl;
 		std::cout << currentPath;
 
 		std::cout << "Longest path is ..... " << sortedCities[i] << std::endl;
@@ -464,6 +535,35 @@ int FindMaximumPathCentrality(StaticVector<StaticVector<int, CITY_COUNT>, CITY_C
 	if (highestScoreIndex != -1) {
 		//std::cout << "Visited city: " << highestScoreIndex + 1 << " Distance from " << startingCity + 1 << " :" << adjMatrix[startingCity][highestScoreIndex] << std::endl;
 		return 1 + FindMaximumPathCentrality(adjMatrix, visited, highestScoreIndex, startingCity, algorithm);
+
+	}
+	else
+		return 1;
+}
+
+int FindMaximumPathCombination(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, bool visited[CITY_COUNT], int startingCity, int prevCity, Algorithms** algorithms) {
+
+	if (prevCity != -1) {
+		for (int i = 0; i < CITY_COUNT; ++i) adjMatrix[prevCity][i] = 0;
+		for (int i = 0; i < CITY_COUNT; ++i) adjMatrix[i][prevCity] = 0;
+	}
+
+	visited[startingCity] = true;
+
+	double highestScore = 0;
+	int highestScoreIndex = -1;
+
+	for (int i = 0; i < CITY_COUNT; ++i){
+		if (adjMatrix[startingCity][i]) {
+			double cur = -0.1 * algorithms[0]->Score(i, adjMatrix, visited) + 0.2 * algorithms[1]->Score(i, adjMatrix, visited) + 0.1 * algorithms[2]->Score(i, adjMatrix, visited) + 0.5 * algorithms[3]->Score(i, adjMatrix, visited);
+			if (cur > highestScore) { highestScore = cur; highestScoreIndex = i; }
+		}
+
+	}
+
+	if (highestScoreIndex != -1) {
+		//std::cout << "Visited city: " << highestScoreIndex + 1 << " Distance from " << startingCity + 1 << " :" << adjMatrix[startingCity][highestScoreIndex] << std::endl;
+		return 1 + FindMaximumPathCombination(adjMatrix, visited, highestScoreIndex, startingCity, algorithms);
 
 	}
 	else
