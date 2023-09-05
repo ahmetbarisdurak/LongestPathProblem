@@ -538,7 +538,7 @@ int main() {
 	for (int i = 0; i < CITY_COUNT; ++i) visited[i] = false;
 
 	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph6 = cityDistances;
-	FindMaximumPathTotalScore(START, graph6);
+	//FindMaximumPathTotalScore(START, graph6);
 	
 
 	/*
