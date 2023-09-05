@@ -20,11 +20,6 @@ public:
 	virtual double Score(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited[CITY_COUNT]) = 0;
 };
 
-class DistanceToStart : public Algorithms {
-public:
-	double Score(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited[CITY_COUNT]);
-};
-
 class ClosenessCentrality : public Algorithms {
 public:
 	double Score(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited[CITY_COUNT]);
@@ -49,7 +44,7 @@ class SecondOrderNeighbors : public Algorithms {
 public:
 	double Score(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited[CITY_COUNT]);
 private:
-	int FirstOrderNeighborScore(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph);
+	int FirstOrderNeighborScore(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited[CITY_COUNT]);
 };
 
 class ThirdOrderNeighbors : public Algorithms {
@@ -165,14 +160,21 @@ int BetweennessCentrality::ComputeBetweennessCentrality(int node, int start, int
 	else return -1;
 }
 
-double DistanceToStart::Score(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited_[CITY_COUNT]) {
-	
-	return graph[START][node];
-}
-
-// Doesn't count the visited cities
+// Find according to visited states of cities
 double FirstOrderNeighbors::Score(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited[CITY_COUNT]) {
 	double tempScore = 0;
+
+	for (int i = 0; i < CITY_COUNT; ++i) {
+		if (graph[node][i] && !visited[i])
+			tempScore++;
+	}
+
+	return 1.0 - 1.0 / tempScore;
+}
+
+// How many neighbors does the node have
+int SecondOrderNeighbors::FirstOrderNeighborScore(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited[CITY_COUNT]) {
+	int tempScore = 0;
 
 	for (int i = 0; i < CITY_COUNT; ++i) {
 		if (graph[node][i] && !visited[i])
@@ -182,28 +184,26 @@ double FirstOrderNeighbors::Score(int node, StaticVector<StaticVector<int, CITY_
 	return tempScore;
 }
 
-// How many neighbors does the node have
-int SecondOrderNeighbors::FirstOrderNeighborScore(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph) {
-	int tempScore = 0;
-
-	for (int i = 0; i < CITY_COUNT; ++i) {
-		if (graph[node][i])
-			tempScore++;
-	}
-
-	return tempScore;
-}
-
 double SecondOrderNeighbors::Score(int node, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited[CITY_COUNT]) {
 
-	double tempScore = 0;
+
+	bool old = visited[node];
+	visited[node] = true;
+
+	double highestScore = 0;
+	int highestScoreIndex = -1;
 	for (int i = 0; i < CITY_COUNT; ++i) {
 		if (graph[node][i] && !visited[i]) {
-			tempScore += FirstOrderNeighborScore(i, graph);
+			double tempScore = FirstOrderNeighborScore(i, graph, visited);
+			if (tempScore > highestScore) {
+				highestScore = tempScore;
+				highestScoreIndex = i;
+			}
 		}
 	}
 
-	return tempScore;
+	visited[node] = old;
+	return 1.0 - 1.0 / max;
 
 }
 
@@ -292,7 +292,6 @@ int Compare(int node1, int node2, StaticVector<StaticVector<int, CITY_COUNT>, CI
 
 	ClosenessCentrality cc;
 	BetweennessCentrality bc;
-	DistanceToStart dc;
 	FirstOrderNeighbors fon;
 	SecondOrderNeighbors son;
 
@@ -543,7 +542,7 @@ int FindMaximumPathCentrality(StaticVector<StaticVector<int, CITY_COUNT>, CITY_C
 
 int FindMaximumPathCombination(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, bool visited[CITY_COUNT], int startingCity, int prevCity, Algorithms** algorithms) {
 
-	if (prevCity != -1) {
+	if (prevCity != -1) { // Blocking the previous city paths
 		for (int i = 0; i < CITY_COUNT; ++i) adjMatrix[prevCity][i] = 0;
 		for (int i = 0; i < CITY_COUNT; ++i) adjMatrix[i][prevCity] = 0;
 	}
@@ -562,7 +561,7 @@ int FindMaximumPathCombination(StaticVector<StaticVector<int, CITY_COUNT>, CITY_
 	}
 
 	if (highestScoreIndex != -1) {
-		//std::cout << "Visited city: " << highestScoreIndex + 1 << " Distance from " << startingCity + 1 << " :" << adjMatrix[startingCity][highestScoreIndex] << std::endl;
+		std::cout << "Visited city: " << highestScoreIndex + 1 << " Distance from " << startingCity + 1 << " :" << adjMatrix[startingCity][highestScoreIndex] << std::endl;
 		return 1 + FindMaximumPathCombination(adjMatrix, visited, highestScoreIndex, startingCity, algorithms);
 
 	}

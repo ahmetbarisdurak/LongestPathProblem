@@ -478,51 +478,67 @@ int main() {
 
 	algorithms[0] = &fon;
 	algorithms[1] = &son;
-	algorithms[2] = &cc;
-	algorithms[3] = &ton;
+	algorithms[2] = &ton;
+	algorithms[3] = &cc;
 
 
 	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph = cityDistances;
+	bool visited[CITY_COUNT];
+	
+
+	for (int i = 0; i < CITY_COUNT; ++i) visited[i] = false;
 	std::cout << "First Order Neighbor Score " << std::endl;
+	std::cout << FindMaximumPathCentrality(graph, visited, START, -1, fon) << std::endl;
 	FindMaximumPath(graph, START, fon);
 
-	graph = cityDistances;
+
+	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph2 = cityDistances;
+	for (int i = 0; i < CITY_COUNT; ++i) visited[i] = false;
 	std::cout << "Second Order Neighbor Score " << std::endl;
+	std::cout << FindMaximumPathCentrality(graph2, visited, START, -1, son) << std::endl;
 	FindMaximumPath(graph, START, son);
 
-	graph = cityDistances;
+
+
+	for (int i = 0; i < CITY_COUNT; ++i) visited[i] = false;
+
+	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph3 = cityDistances;
 	std::cout << "Third Order Neighbor Score " << std::endl;
+	std::cout << FindMaximumPathCentrality(graph3, visited, START, -1, ton) << std::endl;
 	FindMaximumPath(graph, START, ton);
 
-	graph = cityDistances;
+
+	for (int i = 0; i < CITY_COUNT; ++i) visited[i] = false;
+
+	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph4 = cityDistances;
 	std::cout << "Closeness Centrality Score " << std::endl;
+	std::cout << FindMaximumPathCentrality(graph4, visited, START, -1, cc) << std::endl;
 	FindMaximumPath(graph, START, cc);
 
 	graph = cityDistances;
 	std::cout << "Betweenness Centrality Score " << std::endl;
 	//FindMaximumPath(graph, START, bc);
 
-	bool visited[CITY_COUNT];
 
 	for (int i = 0; i < CITY_COUNT; ++i) visited[i] = false;
 
 	graph = cityDistances;
 	std::cout << FindMaximumPathCentrality(graph, visited, START, -1, cc) << std::endl;
-	std::cout << FindEdgeCount(graph) << std::endl;
+	std::cout << "Edge Count " << FindEdgeCount(graph) << std::endl;
 
 	
 	std::cout << "Combination" << std::endl;
 
-	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph1 = cityDistances;
+	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph5 = cityDistances;
 	for (int i = 0; i < CITY_COUNT; ++i) visited[i] = false;
-	std::cout << FindMaximumPathCombination(graph1, visited, START, -1, algorithms) << std::endl;
+	std::cout << "Combination " << FindMaximumPathCombination(graph5, visited, START, -1, algorithms) << std::endl;
 
 
 
 	for (int i = 0; i < CITY_COUNT; ++i) visited[i] = false;
 
-	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph2 = cityDistances;
-	FindMaximumPathTotalScore(START, graph2);
+	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph6 = cityDistances;
+	FindMaximumPathTotalScore(START, graph6);
 	
 
 	/*
