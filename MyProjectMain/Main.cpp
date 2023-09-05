@@ -10,8 +10,6 @@
 #include <StaticVectorUnitTest.cpp>
 #include <HeuristicApproaches.cpp>
 
-#include <unordered_set>
-
 #define DISTANCE 250
 #define TOLERANCE 50
 #define CITY_COUNT 81 // 81

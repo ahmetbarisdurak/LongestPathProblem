@@ -3,8 +3,7 @@
 #include <iostream>
 #include <LinkedListLibrary.h>
 #include <StaticVectorLibrary.h>
-#include <queue>
-#include <unordered_set>
+
 #define CITY_COUNT 81
 #define DISTANCE 250
 #define TOLERANCE 50
