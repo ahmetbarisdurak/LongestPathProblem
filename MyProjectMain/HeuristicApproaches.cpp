@@ -553,7 +553,7 @@ int FindMaximumPathCombination(StaticVector<StaticVector<int, CITY_COUNT>, CITY_
 
 	for (int i = 0; i < CITY_COUNT; ++i){
 		if (graph[startingCity][i]) {
-			double tempScore = -0.1 * algorithms[0]->Score(i, graph, visited) + 0.1 * algorithms[1]->Score(i, graph, visited) + 0.1 * algorithms[2]->Score(i, graph, visited) + 0.5 * algorithms[3]->Score(i, graph, visited);
+			double tempScore = -1 * algorithms[0]->Score(i, graph, visited) + 1 * algorithms[1]->Score(i, graph, visited) + 1 * algorithms[2]->Score(i, graph, visited) + 1 * algorithms[3]->Score(i, graph, visited);
 			
 			if (tempScore > highestScore) {
 				highestScore = tempScore;
