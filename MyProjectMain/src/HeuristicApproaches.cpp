@@ -428,3 +428,29 @@ int FindLongestPathCombination(StaticVector<StaticVector<int, CITY_COUNT>, CITY_
 		
 	return 1;
 }
+
+// Checking if the traversed path is correct or not
+bool CheckPath(StaticVector<int, CITY_COUNT>& path, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& cityDistances) {
+
+	int visited[CITY_COUNT];
+
+	for (int i = 0; i < CITY_COUNT; ++i)
+		visited[i] = 0;
+
+	for (int i = 0; i < CITY_COUNT; ++i) {
+		if (visited[i] == 1) {
+			std::cout << "There is a duplicate element in the path" << std::endl;
+			return false;
+		}
+		visited[i]++;
+	}
+
+	for (int i = 0; i < path.GetSize() - 1; ++i) {
+		int distance = cityDistances[path[i]][path[i + 1]];
+		if (distance < DISTANCE - TOLERANCE || distance > DISTANCE + TOLERANCE) {
+			std::cout << "These two are not neighbors (" << path[i] << ", " << path[i + 1] << ")" << std::endl;
+			return false;
+		}
+	}
+
+}
