@@ -194,7 +194,8 @@ StaticVector<T, N> Mate(IndividualPath<T, N> parent1, IndividualPath<T, N> paren
                 }
             }
             else {
-                temp = parent1[i];
+                
+                temp = parent1.gnome[i];
                 if (!Repeat(childGnome, temp)) {
                     childGnome.PushBack(temp);
                     i++;
@@ -250,7 +251,7 @@ StaticVector<T, N> GeneticAlgorithm(StaticVector<StaticVector<T, N>, N>& adjMatr
     // Generation Number
     int gen = 1;
     // Number of Gene Iterations
-    int genThreshold = 100;
+    int genThreshold = 500;
     
     srand(time(NULL));
 
@@ -279,7 +280,7 @@ StaticVector<T, N> GeneticAlgorithm(StaticVector<StaticVector<T, N>, N>& adjMatr
         << "GNOME     FITNESS VALUE\n";
     for (int i = 0; i < POPULATION_SIZE; i++) {
         std::cout << "Gnome is: " << std::endl;
-        population[i].gnome.PrintData();
+        //std::cout << population[i].gnome;
         std::cout << "Fitness score is: " << population[i].fitnessScore << std::endl;
     }
     
@@ -366,9 +367,9 @@ StaticVector<T, N> GeneticAlgorithm(StaticVector<StaticVector<T, N>, N>& adjMatr
 
             //for (int i = 0; i < POPULATION_SIZE; i++) {
                // cout << "Gnome is: ";
-                newPopulation[0].gnome.PrintData();
+                std::cout << newPopulation[0].gnome;
                 std::cout << "Best of the best" << std::endl;
-                std::cout << " Fitness score is: " << newPopulation[0].fitnessScore << std::endl;
+                std::cout << " Fitness score is: " << newPopulation[0].gnome.GetSize() << std::endl;
             //}
         }
     }

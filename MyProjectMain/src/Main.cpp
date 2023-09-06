@@ -13,6 +13,7 @@
 #include <StaticVectorUnitTest.cpp>
 #include <Algorithms.h>
 #include <HeuristicApproaches.cpp>
+#include <GeneticAlgorithm.cpp>
 
 #define CITY_COUNT 81
 #define START 5
@@ -155,7 +156,8 @@ int main() {
 	std::cout << "-------------------------------------" << std::endl;
 
 	// -------------------------------------------------------------------------------------------- \\
-	//GeneticAlgorithmUtil<int, CITY_COUNT>(adjMatrix);
+	
+	GeneticAlgorithmUtil<int, CITY_COUNT>(cityDistances);
 	
 
 	return 0;
