@@ -7,7 +7,7 @@
 
 #define CITY_COUNT 81 // 81
 #define START 5
-#define DISTANCE 200
+#define DISTANCE 250
 #define TOLERANCE 50
 #define POPULATION_SIZE 100 // ? 100
 

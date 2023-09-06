@@ -14,14 +14,14 @@ StaticVector<int, CITY_COUNT> foundPath;
 StaticVector<int, CITY_COUNT> cityTimes(0);
 
 // DFS that returns the path order
-LinkedList<int, CITY_COUNT> dfs(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, bool visited[CITY_COUNT], int currentVertex) {
+LinkedList<int, CITY_COUNT> DFS(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix, bool visited[CITY_COUNT], int currentVertex) {
 	visited[currentVertex] = true;
 	LinkedList<int, CITY_COUNT> longestPath;
 
 	for (int neighbor = 0; neighbor < CITY_COUNT; ++neighbor) {
 		if (adjMatrix[currentVertex][neighbor] >= (DISTANCE - TOLERANCE) && adjMatrix[currentVertex][neighbor] <= (DISTANCE + TOLERANCE) && !visited[neighbor]) {
 
-			LinkedList<int, CITY_COUNT> neighborPath = dfs(adjMatrix, visited, neighbor);
+			LinkedList<int, CITY_COUNT> neighborPath = DFS(adjMatrix, visited, neighbor);
 
 			if (neighborPath.GetSize() > longestPath.GetSize()) { // finding the max componenet size and it's visiting order
 
@@ -52,7 +52,7 @@ LinkedList<int, CITY_COUNT> dfs(StaticVector<StaticVector<int, CITY_COUNT>, CITY
 }
 
 // trying to find max connected vertices using dfs but doesn't work correctly
-void findMaxConnectedVertices(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix) {
+void FindMaxConnectedVertices(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& adjMatrix) {
 
 	StaticVector<bool, CITY_COUNT> visited(false);
 	LinkedList<int, CITY_COUNT> visitOrder;
@@ -65,7 +65,7 @@ void findMaxConnectedVertices(StaticVector<StaticVector<int, CITY_COUNT>, CITY_C
 		bool visited[CITY_COUNT] = { false };
 		LinkedList<int, CITY_COUNT> visitOrder;
 
-		visitOrder = dfs(adjMatrix, visited, startVertex);
+		visitOrder = DFS(adjMatrix, visited, startVertex);
 
 		//if(startVertex == CITY_COUNT - 1)
 		std::cout << "Visit order is: " << std::endl;
@@ -75,7 +75,7 @@ void findMaxConnectedVertices(StaticVector<StaticVector<int, CITY_COUNT>, CITY_C
 	}
 	/*
 
-	visitOrder = dfs(adjMatrix, visited, startVertex);
+	visitOrder = DFS(adjMatrix, visited, startVertex);
 
 	std::cout << "Found the final values " << std::endl;
 
@@ -93,7 +93,7 @@ LinkedList<int, CITY_COUNT> DFSLongestPath(StaticVector<StaticVector<int, CITY_C
 	for (int neighbor = 0; neighbor < CITY_COUNT; ++neighbor) {
 		if (adjMatrix[currentVertex][neighbor] >= (DISTANCE - TOLERANCE) && adjMatrix[currentVertex][neighbor] <= (DISTANCE + TOLERANCE) && !visited[neighbor]) {
 
-			LinkedList<int, CITY_COUNT> neighborPath = dfs(adjMatrix, visited, neighbor);
+			LinkedList<int, CITY_COUNT> neighborPath = DFS(adjMatrix, visited, neighbor);
 
 			if (neighborPath.GetSize() > maxDepth && neighborPath.Back() == targetVertex) { // finding the max componenet size and it's visiting order
 
@@ -452,4 +452,5 @@ bool CheckPath(StaticVector<int, CITY_COUNT>& path, StaticVector<StaticVector<in
 		}
 	}
 
+	return true;
 }
