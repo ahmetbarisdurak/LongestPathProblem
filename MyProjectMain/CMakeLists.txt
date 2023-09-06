@@ -8,10 +8,11 @@ cmake_minimum_required(VERSION 3.12)
 project(MyProjectMain)
 
 # Add the MyProjectMain executable
-add_executable(MyProjectMain Main.cpp)
+add_executable(MyProjectMain "src/Main.cpp")
 
 # Include directories
-target_include_directories(MyProjectMain PRIVATE "${CMAKE_SOURCE_DIR}/MyProjectMain")
+target_include_directories(MyProjectMain PRIVATE "${CMAKE_SOURCE_DIR}/MyProjectMain/include")
+target_include_directories(MyProjectMain PRIVATE "${CMAKE_SOURCE_DIR}/MyProjectMain/src")
 target_include_directories(MyProjectMain PRIVATE "${CMAKE_SOURCE_DIR}/Common/include")
 target_include_directories(MyProjectMain PRIVATE "${CMAKE_SOURCE_DIR}/CommonUnitTests")
 
