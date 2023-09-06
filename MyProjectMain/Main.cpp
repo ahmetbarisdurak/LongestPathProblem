@@ -380,6 +380,33 @@ int FindEdgeCount(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph
 	return edges;
 }
 
+bool CheckPath(StaticVector<int, CITY_COUNT>& foundPath, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& cityDistances) {
+
+	int visited[CITY_COUNT];
+
+	for (int i = 0; i < CITY_COUNT; ++i)
+		visited[i] = 0;
+
+	for (int i = 0; i < CITY_COUNT; ++i) {
+		if (visited[i] == 1) {
+			std::cout << "There is a duplicate element in the path" << std::endl;
+			return false;
+		}
+		visited[i]++;
+	}
+
+	for (int i = 0; i < foundPath.GetSize() - 1; ++i) {
+		int distance = cityDistances[foundPath[i]][foundPath[i + 1]];
+		if (distance < DISTANCE - TOLERANCE || distance > DISTANCE + TOLERANCE) {
+			std::cout << "There is a problem with neighbors" << std::endl;
+			return false;
+		}
+	}
+
+}
+
+
+
 int main() {
 	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> adjMatrix;
 
@@ -526,16 +553,28 @@ int main() {
 
 	
 	std::cout << "Combination" << std::endl;
+	int correctPathCount = 0;
 
-	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph5 = cityDistances;
+	for (int j = 0; j < CITY_COUNT; ++j) {
+		foundPath = StaticVector<int, CITY_COUNT>();
+		StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph5 = cityDistances;
+		for (int i = 0; i < CITY_COUNT; ++i) visited[i] = false;
+		foundPath.PushBack(j);
+		std::cout << "Combination for city: " << j << "->" << FindMaximumPathCombination(graph5, visited, j, -1, algorithms) << std::endl;
+		std::cout << "Found path size is " << foundPath.GetSize() << std::endl;
+		std::cout << foundPath << std::endl;
+	
+		if (CheckPath(foundPath, cityDistances)) {
+			std::cout << "This path is correct" << std::endl;
+			correctPathCount++;
+		}
+
+	}
+	std::cout << "Correct path count is: " << correctPathCount << std::endl;
+
 	for (int i = 0; i < CITY_COUNT; ++i) visited[i] = false;
-	std::cout << "Combination " << FindMaximumPathCombination(graph5, visited, START, -1, algorithms) << std::endl;
 
-
-
-	for (int i = 0; i < CITY_COUNT; ++i) visited[i] = false;
-
-	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph6 = cityDistances;
+	//StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph6 = cityDistances;
 	//FindMaximumPathTotalScore(START, graph6);
 	
 

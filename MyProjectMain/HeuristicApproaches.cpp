@@ -536,6 +536,9 @@ int FindMaximumPathCentrality(StaticVector<StaticVector<int, CITY_COUNT>, CITY_C
 		return 1;
 }
 
+
+StaticVector<int, CITY_COUNT> foundPath;
+
 int FindMaximumPathCombination(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, bool visited[CITY_COUNT], int startingCity, int prevCity, Algorithms** algorithms) {
 
 	if (prevCity != -1) { // Blocking the previous city paths
@@ -563,7 +566,8 @@ int FindMaximumPathCombination(StaticVector<StaticVector<int, CITY_COUNT>, CITY_
 	}
 
 	if (highestScoreIndex != -1) {
-		std::cout << "Visited city: " << highestScoreIndex + 1 <<  std::endl;
+		foundPath.PushBack(highestScoreIndex);
+		//std::cout << "Visited city: " << highestScoreIndex + 1 <<  std::endl;
 		return 1 + FindMaximumPathCombination(graph, visited, highestScoreIndex, startingCity, algorithms);
 
 	}
