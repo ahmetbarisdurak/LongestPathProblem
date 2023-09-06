@@ -99,14 +99,14 @@ int main() {
 	
 
 	for (int i = 0; i < CITY_COUNT; ++i) visited[i] = false;
-	std::cout << "First Order Neighbor Score " << std::endl;
-	std::cout << FindLongestPathAlgorithms(graph, visited, START, -1, firstOrderNeighbors) << std::endl;
+	std::cout << "First Order Neighbor Score" << std::endl;
+	std::cout << "Found score is: " << FindLongestPathAlgorithms(graph, visited, START, -1, firstOrderNeighbors) << std::endl;
 	std::cout << "-------------------------------------" << std::endl;
 
 	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph2 = cityDistances;
 	for (int i = 0; i < CITY_COUNT; ++i) visited[i] = false;
 	std::cout << "Second Order Neighbor Score " << std::endl;
-	std::cout << FindLongestPathAlgorithms(graph2, visited, START, -1, secondOrderNeighbors) << std::endl;
+	std::cout << "Found score is: " << FindLongestPathAlgorithms(graph2, visited, START, -1, secondOrderNeighbors) << std::endl;
 	std::cout << "-------------------------------------" << std::endl;
 
 
@@ -114,20 +114,20 @@ int main() {
 	for (int i = 0; i < CITY_COUNT; ++i) visited[i] = false;
 	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph3 = cityDistances;
 	std::cout << "Third Order Neighbor Score " << std::endl;
-	std::cout << FindLongestPathAlgorithms(graph3, visited, START, -1, thirdOrderNeighbors) << std::endl;
+	std::cout << "Found score is: " << FindLongestPathAlgorithms(graph3, visited, START, -1, thirdOrderNeighbors) << std::endl;
 	std::cout << "-------------------------------------" << std::endl;
 
 	for (int i = 0; i < CITY_COUNT; ++i) visited[i] = false;
 	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph4 = cityDistances;
 	std::cout << "Closeness Centrality Score " << std::endl;
-	std::cout << FindLongestPathAlgorithms(graph4, visited, START, -1, closenessCentrality) << std::endl;
+	std::cout << "Found score is: " << FindLongestPathAlgorithms(graph4, visited, START, -1, closenessCentrality) << std::endl;
 	std::cout << "-------------------------------------" << std::endl;
 
 
 	for (int i = 0; i < CITY_COUNT; ++i) visited[i] = false;
 	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph7 = cityDistances;
 	std::cout << "Betweenness Centrality Score " << std::endl;
-	//std::cout << FindLongestPathAlgorithms(graph7, visited, START, -1, bcbetweennessCentrality << std::endl;
+	//std::cout << "Found score is: " << FindLongestPathAlgorithms(graph7, visited, START, -1, bcbetweennessCentrality << std::endl;
 	std::cout << "-------------------------------------" << std::endl;
 
 	
@@ -141,13 +141,14 @@ int main() {
 		foundPath.PushBack(j);
 		std::cout << "Combination for city: " << j << "->" << FindLongestPathCombination(graph5, visited, j, -1, algorithms) << std::endl;
 		std::cout << "Found path size is " << foundPath.GetSize() << std::endl;
-		std::cout << foundPath << std::endl;
+		std::cout << foundPath;
 	
 		if (CheckPath(foundPath, cityDistances)) {
 			std::cout << "This path is correct" << std::endl;
 			correctPathCount++;
 		}
 
+		std::cout << "-------------------------------------" << std::endl;
 	}
 	std::cout << "-------------------------------------" << std::endl;
 

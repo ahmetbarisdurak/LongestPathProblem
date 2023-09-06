@@ -5,8 +5,6 @@
 #include <StaticVectorLibrary.h>
 #include <time.h>
 
-using namespace std;
-
 #define CITY_COUNT 81 // 81
 #define START 5
 #define DISTANCE 200
@@ -41,12 +39,10 @@ template <class T, unsigned int N>
 int CalculateFitness(StaticVector<T, N> gnome, StaticVector<StaticVector<T, N>, N>& adjMatrix) {
     int score = 0;
     for (int i = 0; i < gnome.GetSize() - 1; i++) {
-        if (adjMatrix.GetIndex(gnome.GetIndex(i)).GetIndex(gnome.GetIndex(i + 1)) <= DISTANCE + TOLERANCE
-            && adjMatrix.GetIndex(gnome.GetIndex(i)).GetIndex(gnome.GetIndex(i + 1)) >= DISTANCE - TOLERANCE)
+        if (adjMatrix[gnome[i]][gnome[i+1]] <= DISTANCE + TOLERANCE && adjMatrix[gnome[i]][gnome[i + 1]]  >= DISTANCE - TOLERANCE)
             score += 1;
         else
             return -1;
-        //score += 1; //adjMatrix.GetIndex(gnome.GetIndex(i)).GetIndex(gnome.GetIndex(i + 1));
     }
     return score;
 }
@@ -79,7 +75,7 @@ template <typename T, unsigned int N>
 bool Repeat(StaticVector<T,N>& gnome, T temp) {
 
     for (int i = 0; i < gnome.GetSize(); i++) {
-        if (gnome.GetIndex(i) == temp) // comparator gerekebilir
+        if (gnome[i] == temp) // comparator gerekebilir
             return true;
     }
     return false;
@@ -94,11 +90,10 @@ int FindMostNeighborIndex(int startingIndex, StaticVector<T, N> tempGnome, Stati
     for (int i = 0; i < N; i++) {
         
         int temp = 0;
-        if (!Repeat(tempGnome, i) && adjMatrix.GetIndex(startingIndex).GetIndex(i) <= DISTANCE + TOLERANCE && adjMatrix.GetIndex(startingIndex).GetIndex(i) >= DISTANCE - TOLERANCE) {
+        if (!Repeat(tempGnome, i) && adjMatrix[startingIndex][i] <= DISTANCE + TOLERANCE && adjMatrix[startingIndex][i] >= DISTANCE - TOLERANCE) {
             for (int j = 0; j < N; j++) {
-                if (adjMatrix.GetIndex(i).GetIndex(j) <= DISTANCE + TOLERANCE && adjMatrix.GetIndex(i).GetIndex(j) >= DISTANCE - TOLERANCE)
+                if (adjMatrix[i][j] <= DISTANCE + TOLERANCE && adjMatrix[i][j] >= DISTANCE - TOLERANCE)
                     temp++;
-
             }
         }
 
@@ -111,9 +106,7 @@ int FindMostNeighborIndex(int startingIndex, StaticVector<T, N> tempGnome, Stati
 
 
     return mostNeighborIndex;
-
 }
-
 
 template <class T, unsigned int N>
 StaticVector<T, N> CreateGnome(StaticVector<StaticVector<T, N>, N>& adjMatrix) {
@@ -125,7 +118,7 @@ StaticVector<T, N> CreateGnome(StaticVector<StaticVector<T, N>, N>& adjMatrix) {
     tempGnome.PushBack(START);
 
     for (int i = 0; i < gnomeSize; i++) {
-        int mostNeighborIndex = FindMostNeighborIndex(tempGnome.GetIndex(i), tempGnome, adjMatrix);
+        int mostNeighborIndex = FindMostNeighborIndex(tempGnome[i], tempGnome, adjMatrix);
 
         if (mostNeighborIndex == -1) {
             // add a random neighbor which is not in gnome
@@ -161,9 +154,9 @@ StaticVector<T, N> MutatedGene(StaticVector<T, N> gnome)
         int r1 = RandNum(1, gnome.GetSize());
 
         if (r1 != r && r1 != START && r != START) {
-            T temp = gnome.GetIndex(r);
-            gnome.SetIndex(r, gnome.GetIndex(r1));
-            gnome.SetIndex(r1, temp);
+            T temp = gnome[r];
+            gnome[r] = gnome[r1];
+            gnome[r1] = temp;
             break;
         }
     }
@@ -183,7 +176,7 @@ StaticVector<T, N> Mate(IndividualPath<T, N> parent1, IndividualPath<T, N> paren
     int childGnomeSize = (parent1.gnome.GetSize() + parent2.gnome.GetSize()) / 2; // Getting mean of parent1 and parent2 sizes
     int i = 0;
     float p = 0;
-    childGnome.PushBack(parent1.gnome.GetIndex(0)); // Start should be same for all offsprings
+    childGnome.PushBack(parent1.gnome[0]); // Start should be same for all offsprings
     i++;
     while(i < childGnomeSize) {
         
@@ -201,7 +194,7 @@ StaticVector<T, N> Mate(IndividualPath<T, N> parent1, IndividualPath<T, N> paren
                 }
             }
             else {
-                temp = parent1.gnome.GetIndex(i);
+                temp = parent1[i];
                 if (!Repeat(childGnome, temp)) {
                     childGnome.PushBack(temp);
                     i++;
@@ -219,7 +212,7 @@ StaticVector<T, N> Mate(IndividualPath<T, N> parent1, IndividualPath<T, N> paren
                 }
             }
             else {
-                temp = parent2.gnome.GetIndex(i);
+                temp = parent2.gnome[i];
                 if (!Repeat(childGnome, temp)) {
                     childGnome.PushBack(temp);
                     i++;
@@ -240,14 +233,11 @@ StaticVector<T, N> Mate(IndividualPath<T, N> parent1, IndividualPath<T, N> paren
     return childGnome;
 }
 
-
-
 // Function to return the updated value
 // of the cooling element.
 int Cooldown(int temp) {
     return (90 * temp) / 100;
 }
-
 
 template< class T, unsigned int N>
 bool ComparePathsByFitnessScore(const IndividualPath<T,N>& path1, const IndividualPath<T,N>& path2) {
@@ -268,8 +258,8 @@ StaticVector<T, N> GeneticAlgorithm(StaticVector<StaticVector<T, N>, N>& adjMatr
     struct IndividualPath<T, N> tempPath;
     StaticVector<T, N> tempGnome;
 
-    cout << "Printing the gnomes and their fitness scores" << endl;
-    cout << "Creating random gnomes for population" << endl;
+    std::cout << "Printing the gnomes and their fitness scores" << std::endl;
+    std::cout << "Creating random gnomes for population" << std::endl;
     // Populating the GNOME pool.
     
     for (int i = 0; i < POPULATION_SIZE; i++) {
@@ -285,12 +275,12 @@ StaticVector<T, N> GeneticAlgorithm(StaticVector<StaticVector<T, N>, N>& adjMatr
     }
 
     
-    cout << "\nInitial population: " << endl
+    std::cout << "\nInitial population: " << std::endl
         << "GNOME     FITNESS VALUE\n";
     for (int i = 0; i < POPULATION_SIZE; i++) {
-        cout << "Gnome is: " << endl;
-        population.GetIndex(i).gnome.PrintData();
-        cout << "Fitness score is: " << population.GetIndex(i).fitnessScore << endl;
+        std::cout << "Gnome is: " << std::endl;
+        population[i].gnome.PrintData();
+        std::cout << "Fitness score is: " << population[i].fitnessScore << std::endl;
     }
     
     
@@ -341,9 +331,9 @@ StaticVector<T, N> GeneticAlgorithm(StaticVector<StaticVector<T, N>, N>& adjMatr
         for (int i = 0; i < POPULATION_SIZE; i++)
         {
             int r = RandNum(0, POPULATION_SIZE);
-            IndividualPath<T,N> parent1 = population.GetIndex(r);
+            IndividualPath<T, N> parent1 = population[r];
             r = RandNum(0, POPULATION_SIZE);
-            IndividualPath<T, N> parent2 = population.GetIndex(r);
+            IndividualPath<T, N> parent2 = population[r];
             StaticVector<T, N> newGnome = Mate(parent1, parent2);
 
             struct IndividualPath<T, N> offspring;
@@ -376,9 +366,9 @@ StaticVector<T, N> GeneticAlgorithm(StaticVector<StaticVector<T, N>, N>& adjMatr
 
             //for (int i = 0; i < POPULATION_SIZE; i++) {
                // cout << "Gnome is: ";
-                newPopulation.GetIndex(0).gnome.PrintData();
-                cout << "Best of the best" << endl;
-                cout << " Fitness score is: " << newPopulation.GetIndex(0).fitnessScore << endl;
+                newPopulation[0].gnome.PrintData();
+                std::cout << "Best of the best" << std::endl;
+                std::cout << " Fitness score is: " << newPopulation[0].fitnessScore << std::endl;
             //}
         }
     }
