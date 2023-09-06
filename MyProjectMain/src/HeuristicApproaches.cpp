@@ -8,7 +8,6 @@
 #define CITY_COUNT 81
 #define DISTANCE 250
 #define TOLERANCE 50
-#define START 5
 
 StaticVector<int, CITY_COUNT> longestPath;
 StaticVector<int, CITY_COUNT> foundPath;

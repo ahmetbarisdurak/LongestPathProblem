@@ -14,8 +14,6 @@
 #include <Algorithms.h>
 #include <HeuristicApproaches.cpp>
 
-#define DISTANCE 250
-#define TOLERANCE 50
 #define CITY_COUNT 81
 #define START 5
 
@@ -81,12 +79,12 @@ int main() {
 
 	CreateGraph(cityDistances);
 	
+	Algorithms<int, CITY_COUNT>* algorithms[4];
 	FirstOrderNeighbors<int, CITY_COUNT> firstOrderNeighbors;
 	SecondOrderNeighbors<int, CITY_COUNT> secondOrderNeighbors;
 	ThirdOrderNeighbors<int, CITY_COUNT> thirdOrderNeighbors;
 	ClosenessCentrality<int, CITY_COUNT> closenessCentrality;
 	BetweennessCentrality<int, CITY_COUNT> betweennessCentrality;
-	Algorithms<int, CITY_COUNT>* algorithms[4];
 
 	algorithms[0] = &firstOrderNeighbors;
 	algorithms[1] = &secondOrderNeighbors;
