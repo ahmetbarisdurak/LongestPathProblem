@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <locale> // Include the <locale> header
 
 // My Libraries
 #include <LinkedListLibrary.h>
@@ -20,8 +21,8 @@
 
 // Reading CSV file and writing into StaticVectors
 void readCSVFile(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& cityDistances, StaticVector<std::string, CITY_COUNT>& cityNames) {
-	std::ifstream file("ilmesafe.csv"); // Open the CSV file
-
+	std::ifstream file("ilmesafe.csv", std::ios::in | std::ios::binary); // Open the CSV file
+	
 	if (file.is_open()) {
 		std::string line;
 		int i = 0;
@@ -29,26 +30,26 @@ void readCSVFile(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& cityDi
 
 		std::getline(file, line);
 		std::getline(file, line);
-		while (std::getline(file, line)) {
+			while (std::getline(file, line)) {
 			std::istringstream iss(line);
 			std::string token;
 			std::getline(iss, token, ';'); // city plate
 
 			std::getline(iss, token, ';'); // city name
-			cityNames.SetIndex(i, token);
+			cityNames[i] = token;
 
 
 			while (std::getline(iss, token, ';')) {
 				int value;
 				std::istringstream(token) >> value;
-				cityDistances.GetIndex(i).SetIndex(j, value);
+				cityDistances[i][j] = value;
 				j++;
 			}
 
 			i++;
 			j = 0;
 
-			if (i == 81)
+			if (i == CITY_COUNT)
 				break;
 		}
 
@@ -68,6 +69,82 @@ void RunTests() {
 
 	RunStaticVectorTests();
 	RunLinkedListTests();
+}
+
+bool WriteToFile(std::string fileName, StaticVector<std::string, CITY_COUNT>& cityNames, StaticVector<int, CITY_COUNT>& foundPath) {
+
+	// Open an output file stream
+	std::ofstream outputFile(fileName, std::ios::out | std::ios::binary);
+
+	if (!outputFile.is_open()) {
+		std::cerr << "Failed to open the output file." << std::endl;
+		return 1; // Exit with an error code
+	}
+
+	std::string startingCityName = cityNames[foundPath[0]];
+
+	outputFile << "PATH FOUND FOR " << foundPath[0] + 1 << " : " << startingCityName << std::endl;
+	outputFile << "PATH LENGTH IS -> " << foundPath.GetSize() << std::endl;
+
+	for (int i = 0; i < foundPath.GetSize(); ++i) {
+		outputFile << cityNames[foundPath[i]] << std::endl;
+	}
+
+	// Close the output file
+	outputFile.close();
+
+	return 0;
+
+}
+
+// Checking if the traversed path is correct or not
+bool CheckPath(std::string fileName, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& cityDistances, StaticVector<std::string, CITY_COUNT> cityNames) {
+
+	StaticVector<int, CITY_COUNT> foundPath;
+	int visited[CITY_COUNT] = { 0 };
+
+	std::ifstream file(fileName, std::ios::in | std::ios::binary); // Open the CSV file
+
+	if (!file.is_open()) {
+		std::cerr << "Failed to open the output file." << std::endl;
+		return 1; // Exit with an error code
+	}
+
+	std::string city;
+	std::getline(file, city);
+	std::getline(file, city);
+
+	while (!file.eof()) {
+		std::getline(file, city);
+
+		for (int i = 0; i < CITY_COUNT; ++i) {
+			if (cityNames[i] == city) {
+				foundPath.PushBack(i);
+			}
+		}
+	}
+
+	file.close();
+
+	for (int i = 0; i < foundPath.GetSize(); ++i)
+		visited[foundPath[i]]++;
+
+	for (int i = 0; i < CITY_COUNT; ++i) {
+		if (visited[i] > 1) {
+			std::cout << "There is a duplicate element in the path" << std::endl;
+			return false;
+		}
+	}
+
+	for (int i = 0; i < foundPath.GetSize() - 1; ++i) {
+		int distance = cityDistances[foundPath[i]][foundPath[i + 1]];
+		if (distance < DISTANCE - TOLERANCE || distance > DISTANCE + TOLERANCE) {
+			std::cout << "These two are not neighbors (" << foundPath[i] << ", " << foundPath[i + 1] << ")" << std::endl;
+			return false;
+		}
+	}
+	
+	return true;
 }
 
 int main() {
@@ -132,6 +209,7 @@ int main() {
 	
 	std::cout << "Combination" << std::endl;
 	int correctPathCount = 0;
+	std::string fileName = "results/";
 
 	for (int j = 0; j < CITY_COUNT; ++j) {
 		foundPath = StaticVector<int, CITY_COUNT>();
@@ -142,7 +220,9 @@ int main() {
 		std::cout << "Found path size is " << foundPath.GetSize() << std::endl;
 		std::cout << foundPath;
 	
-		if (CheckPath(foundPath, cityDistances)) {
+		WriteToFile(fileName + cityNames[foundPath[0]] + ".txt", cityNames, foundPath);
+
+		if (CheckPath(fileName + cityNames[foundPath[0]] + ".txt", cityDistances, cityNames)) {
 			std::cout << "This path is correct" << std::endl;
 			correctPathCount++;
 		}
@@ -157,8 +237,7 @@ int main() {
 
 	// -------------------------------------------------------------------------------------------- \\
 	
-	GeneticAlgorithmUtil<int, CITY_COUNT>(cityDistances);
+	//GeneticAlgorithmUtil<int, CITY_COUNT>(cityDistances);
 	
-
 	return 0;
 }
