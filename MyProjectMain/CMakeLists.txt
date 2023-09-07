@@ -7,6 +7,10 @@ cmake_minimum_required(VERSION 3.12)
 # Set the project name
 project(MyProjectMain)
 
+
+add_compile_options(-fexec-charset=UTF-16)
+
+
 # Add the MyProjectMain executable
 add_executable(MyProjectMain "src/Main.cpp")
 

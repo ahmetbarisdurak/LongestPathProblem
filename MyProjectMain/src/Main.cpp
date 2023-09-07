@@ -1,11 +1,10 @@
-﻿// MyProject.cpp : Defines the entry point for the application.
+// MyProject.cpp : Defines the entry point for the application.
 //
 // Pre-defined libraries
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <locale> // Include the <locale> header
 
 // My Libraries
 #include <LinkedListLibrary.h>
@@ -16,13 +15,14 @@
 #include <HeuristicApproaches.cpp>
 #include <GeneticAlgorithm.cpp>
 
+
 #define CITY_COUNT 81
 #define START 5
 
 // Reading CSV file and writing into StaticVectors
 void readCSVFile(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& cityDistances, StaticVector<std::string, CITY_COUNT>& cityNames) {
 	std::ifstream file("ilmesafe.csv", std::ios::in | std::ios::binary); // Open the CSV file
-	
+
 	if (file.is_open()) {
 		std::string line;
 		int i = 0;
@@ -30,7 +30,7 @@ void readCSVFile(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& cityDi
 
 		std::getline(file, line);
 		std::getline(file, line);
-			while (std::getline(file, line)) {
+		while (std::getline(file, line)) {
 			std::istringstream iss(line);
 			std::string token;
 			std::getline(iss, token, ';'); // city plate
@@ -54,14 +54,9 @@ void readCSVFile(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& cityDi
 		}
 
 		file.close(); // Close the CSV file
-	
 	}
-	else {
+	else
 		std::cout << "File is not open" << std::endl;
-	}
-
-
-
 }
 
 // Testing the static vector and linked list classes
@@ -74,7 +69,9 @@ void RunTests() {
 bool WriteToFile(std::string fileName, StaticVector<std::string, CITY_COUNT>& cityNames, StaticVector<int, CITY_COUNT>& foundPath) {
 
 	// Open an output file stream
-	std::ofstream outputFile(fileName, std::ios::out | std::ios::binary);
+	std::ofstream outputFile(fileName.c_str(), std::ios::out | std::ios::binary);
+
+	std::cout << fileName << " is filename" << std::endl;
 
 	if (!outputFile.is_open()) {
 		std::cerr << "Failed to open the output file." << std::endl;
@@ -96,6 +93,7 @@ bool WriteToFile(std::string fileName, StaticVector<std::string, CITY_COUNT>& ci
 	return 0;
 
 }
+
 
 // Checking if the traversed path is correct or not
 bool CheckPath(std::string fileName, StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& cityDistances, StaticVector<std::string, CITY_COUNT> cityNames) {
@@ -143,13 +141,12 @@ bool CheckPath(std::string fileName, StaticVector<StaticVector<int, CITY_COUNT>,
 			return false;
 		}
 	}
-	
+
 	return true;
 }
 
 int main() {
 	//RunTests();
-
 	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> cityDistances;
 	StaticVector<std::string, CITY_COUNT> cityNames;
 

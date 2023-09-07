@@ -5,7 +5,6 @@ cmake_minimum_required (VERSION 3.8)
 
 project (MyProject)
 
-
 # Include sub-projects.
 add_subdirectory ("MyProjectMain")
 add_subdirectory("Common")
