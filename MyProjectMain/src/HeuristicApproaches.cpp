@@ -6,7 +6,7 @@
 #include <StaticVectorLibrary.h>
 
 #define CITY_COUNT 81
-#define DISTANCE 250
+#define DISTANCE 200
 #define TOLERANCE 50
 
 StaticVector<int, CITY_COUNT> longestPath;
@@ -217,10 +217,10 @@ void BFSSearchLongest(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& a
 }
 
 // Creating graph for better usability assigning 0 if there are no paths between cities assigning the length if there is a path between
-void CreateGraph(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph) {
+void CreateGraph(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT>& graph, int distance, int tolerance) {
 	for (int i = 0; i < CITY_COUNT; ++i) {
 		for (int j = 0; j < CITY_COUNT; ++j) {
-			if (graph[i][j] > DISTANCE + TOLERANCE || graph[i][j] < DISTANCE - TOLERANCE)
+			if (graph[i][j] > distance + tolerance || graph[i][j] < distance - tolerance)
 				graph[i][j] = 0;
 		}
 	}

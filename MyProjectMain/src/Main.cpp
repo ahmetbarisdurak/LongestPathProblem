@@ -145,6 +145,72 @@ bool CheckPath(std::string fileName, StaticVector<StaticVector<int, CITY_COUNT>,
 	return true;
 }
 
+void FindMinimumDistanceTolerance(StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> adjMatrix, Algorithms<int, CITY_COUNT>** algorithms){
+
+	int distance = 220;
+	int tolerance = 50;
+	bool visited[CITY_COUNT] = { false };
+	int maximumDistance = 0;
+	int maximumTolerance = 0;
+	int maximumResult = 0;
+
+	while (distance > 0) {
+		tolerance = 50;
+
+		while (tolerance > 0) {
+			StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph1 = adjMatrix;
+
+			CreateGraph(graph1, distance, tolerance);
+
+			for (int i = 0; i < CITY_COUNT; ++i) visited[i] = false;
+
+			std::cout << "Testing for " << distance << " and " << tolerance << std::endl;
+ 			int score = FindLongestPathCombination(graph1, visited, START, -1, algorithms);
+			std::cout << "Found score is " << score << std::endl;
+
+			if (score >= maximumResult) {
+				maximumDistance = distance;
+				maximumTolerance = tolerance;
+				maximumResult = score;
+			}
+
+
+			tolerance -= 1;
+		}
+
+		distance -= 1;
+	}
+
+	std::cout << "OPTIMUM DISTANCE AND TOLERANCE: " << maximumDistance << ", " << maximumTolerance << " WITH CITY COUNT:" << maximumResult << std::endl;
+}
+/*
+void find_optimum_xy2(LocalOptima& lo) {
+	Vector<Vector<int, SIZE>, SIZE> graph = cities;
+	int distance = 1000, tolerance = 100;
+	bool visited[SIZE] = { false };
+	double max = 0;
+	int maxdist = 0, maxtolerance = 0, globalmax = 0;
+
+	for (; distance >= 100; distance -= 3) {
+		for (; tolerance > 10; tolerance -= 2) {
+			graph = cities;
+			init_graph(distance, tolerance, graph);
+			//for (int i = 0; i < SIZE; ++i) visited[i] = false;
+			//int cur = find_max_travel(5, -1, visited, graph, lo);
+
+			double nt = tolerance / 100.0, nd = (distance - 100) / 100.0;
+			int edges = edge_count(graph); for (int i = 0; i < SIZE; ++i) visited[i] = false;
+			double score = (double)find_max_travel(5, -1, visited, graph, lo) / (nt + nd);
+			if (score > max) { max = score; maxdist = distance; maxtolerance = tolerance; }
+		}
+	}
+
+
+	init_graph(maxdist, maxtolerance, graph);
+	std::cout << "OPTIMUM DISTANCE AND TOLERANCE: " << maxdist << ", " << maxtolerance << " WITH CITY COUNT:" << find_max_travel(5, -1, visited, graph, lo) << std::endl;
+}
+
+*/
 int main() {
 	//RunTests();
 	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> cityDistances;
@@ -152,7 +218,7 @@ int main() {
 
 	readCSVFile(cityDistances, cityNames);
 
-	CreateGraph(cityDistances);
+	CreateGraph(cityDistances, DISTANCE, TOLERANCE);
 	
 	Algorithms<int, CITY_COUNT>* algorithms[4];
 	FirstOrderNeighbors<int, CITY_COUNT> firstOrderNeighbors;
@@ -165,6 +231,10 @@ int main() {
 	algorithms[1] = &secondOrderNeighbors;
 	algorithms[2] = &thirdOrderNeighbors;
 	algorithms[3] = &closenessCentrality;
+
+
+	FindMinimumDistanceTolerance(cityDistances, algorithms);
+
 
 
 	StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph = cityDistances;
@@ -207,8 +277,10 @@ int main() {
 	std::cout << "Combination" << std::endl;
 	int correctPathCount = 0;
 	std::string fileName = "results/";
-
-	for (int j = 0; j < CITY_COUNT; ++j) {
+	
+	int j = START;
+	
+	//for (int j = 0; j < CITY_COUNT; ++j) {
 		foundPath = StaticVector<int, CITY_COUNT>();
 		StaticVector<StaticVector<int, CITY_COUNT>, CITY_COUNT> graph5 = cityDistances;
 		for (int i = 0; i < CITY_COUNT; ++i) visited[i] = false;
@@ -225,7 +297,7 @@ int main() {
 		}
 
 		std::cout << "-------------------------------------" << std::endl;
-	}
+	//}
 	std::cout << "-------------------------------------" << std::endl;
 
 	
