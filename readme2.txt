@@ -89,7 +89,7 @@ FindLongestPathAlgorithms: This function tries to find the longest path using a 
 
 FindLongestPathCombination: This function combines the results of multiple algorithms to find the longest path.
 
-CreateGraph: This function filters out edges in the graph that do not meet distance and tolerance criteria.
+CreateGraph: This function filters out edges in the graph that do not meet distance and tolerance criteria. So it creates a graph
 
 CheckPath: This function validates whether a found path is correct based on certain criteria.
 
